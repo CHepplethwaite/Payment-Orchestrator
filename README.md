@@ -1,7 +1,3 @@
-Here’s a clean and professional **README.md** you can use for your **`platform`** repository — it’s short, clear, and structured for a commercial-grade .NET + Angular project.
-
----
-
 ```markdown
 # Universal Payment Platform
 
