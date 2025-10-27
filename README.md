@@ -39,8 +39,3 @@ Visit **[http://localhost:4200](http://localhost:4200)** to access the platform.
 GitHub: [@CHepplethwaite](https://github.com/CHepplethwaite)
 
 ```
-
----
-
-Would you like me to include a one-line **description at the top for GitHub’s repo summary** (so it matches the README intro)?
-```
