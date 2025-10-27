@@ -1,41 +1,7 @@
-````markdown
 # Universal Payment Platform
 
-A commercial-grade payment integration engine built with **.NET 9 Web API** and **Angular**.  
-It supports seamless integration with multiple banks and mobile money platforms, providing secure, reliable, and scalable transaction processing.
+The Universal Payment Platform is a modern, secure, and scalable engine designed to unify digital payments across banks and mobile money providers. 
 
-## Features
-- Multi-bank and mobile money integration  
-- Secure transaction processing  
-- Modular and extensible architecture  
-- Logging and error handling  
-- Ready for enterprise deployment  
+Built with **.NET 9 Web API** and **Angular**, it simplifies integration for businesses by providing a single interface for managing transactions, monitoring payments, and extending financial connectivity across multiple channels.  
 
-## Tech Stack
-- **Backend:** .NET 9 Web API  
-- **Frontend:** Angular  
-- **Database:** SQL Server / PostgreSQL  
-
-## Getting Started
-
-### Backend
-```bash
-cd backend/src/universal-payment-platform
-dotnet run
-````
-
-### Frontend
-
-```bash
-cd frontend/universal-payment-ui
-ng serve
-```
-
-Visit **[http://localhost:4200](http://localhost:4200)** to access the platform.
-
-## Author
-
-**Clifford Hepplethwaite**
-GitHub: [@CHepplethwaite](https://github.com/CHepplethwaite)
-
-```
+This system is designed for flexibility, reliability, and performance — supporting seamless financial operations in enterprise environments.
