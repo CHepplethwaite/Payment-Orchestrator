@@ -2,5 +2,12 @@
 {
     public class PaymentRequest
     {
+        public string TransactionId { get; set; }
+        public decimal Amount { get; set; }
+        public string Currency { get; set; } = "USD";
+        public string CustomerMSISDN { get; set; }
+        public string Reference { get; set; }
+        public string Description { get; set; }
+        public Dictionary<string, string> AdditionalParameters { get; set; }
     }
 }

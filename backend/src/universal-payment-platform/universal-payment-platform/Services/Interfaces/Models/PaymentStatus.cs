@@ -1,6 +1,11 @@
 ﻿namespace universal_payment_platform.Services.Interfaces.Models
 {
-    public class PaymentStatus
+    public enum PaymentStatus
     {
+        Pending,
+        Success,
+        Failed,
+        Cancelled,
+        InProgress
     }
 }
