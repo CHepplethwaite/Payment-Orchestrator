@@ -1,69 +1,33 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
-using universal_payment_platform.Services.ThirdPartyBankAdapters;
 
 namespace universal_payment_platform.Services.Implementations
 {
     public class PaymentService : IPaymentService
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<PaymentService> _logger;
-        private readonly Dictionary<string, Type> _adapterTypes;
+        private readonly IBankIntegrationService _bankIntegrationService;
+        private readonly IEnumerable<IPaymentAdapter> _adapters;
 
-        public PaymentService(IServiceProvider serviceProvider, ILogger<PaymentService> logger)
+        public PaymentService(IBankIntegrationService bankIntegrationService, IEnumerable<IPaymentAdapter> adapters)
         {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-
-            // Register available adapters
-            _adapterTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "Airtel", typeof(AirtelAdapter) },
-                { "MTN", typeof(MTNAdapter) },
-                { "FNB", typeof(FNBAdapter) },
-                { "ABSA", typeof(ABSAAdapter) },
-                { "Stanbic", typeof(StanbicAdapter) },
-                { "Stanchart", typeof(StanchartAdapter) }
-            };
+            _bankIntegrationService = bankIntegrationService;
+            _adapters = adapters;
         }
 
-        public async Task<PaymentResponse> ProcessPaymentAsync(PaymentRequest request, string provider)
+        public Task<PaymentResponse> ProcessPaymentAsync(PaymentRequest request, string provider)
         {
-            if (string.IsNullOrEmpty(provider))
-                throw new ArgumentException("Provider cannot be null or empty", nameof(provider));
-
-            var adapter = GetPaymentAdapter(provider);
-            var integrationService = new BankIntegrationService(adapter,
-                _serviceProvider.GetService<ILogger<BankIntegrationService>>());
-
-            return await integrationService.ProcessPaymentAsync(request);
+            request.Provider = provider; // ensure provider is set
+            return _bankIntegrationService.ProcessPaymentAsync(request);
         }
 
-        public async Task<PaymentResponse> GetPaymentStatusAsync(string transactionId, string provider)
+        public Task<PaymentResponse> GetPaymentStatusAsync(string transactionId, string provider)
         {
-            if (string.IsNullOrEmpty(provider))
-                throw new ArgumentException("Provider cannot be null or empty", nameof(provider));
-
-            var adapter = GetPaymentAdapter(provider);
-            var integrationService = new BankIntegrationService(adapter,
-                _serviceProvider.GetService<ILogger<BankIntegrationService>>());
-
-            return await integrationService.CheckPaymentStatusAsync(transactionId);
+            return _bankIntegrationService.CheckPaymentStatusAsync(transactionId, provider);
         }
 
         public Task<List<string>> GetSupportedProvidersAsync()
         {
-            return Task.FromResult(_adapterTypes.Keys.ToList());
-        }
-
-        private IPaymentAdapter GetPaymentAdapter(string provider)
-        {
-            if (_adapterTypes.TryGetValue(provider, out var adapterType))
-            {
-                return (IPaymentAdapter)_serviceProvider.GetService(adapterType);
-            }
-
-            throw new NotSupportedException($"Payment provider '{provider}' is not supported");
+            return Task.FromResult(_adapters.Select(a => a.GetAdapterName()).ToList());
         }
     }
 }

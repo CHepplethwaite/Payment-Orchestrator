@@ -15,25 +15,25 @@ builder.Services.AddOpenApi();
 // ------------------------
 // Register core services
 // ------------------------
-builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IBankIntegrationService, BankIntegrationService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // ------------------------
-// Register HTTP clients for adapters
+// Register HTTP clients for adapters that call external APIs
 // ------------------------
-// Only needed for adapters that call external APIs
 builder.Services.AddHttpClient<AirtelAdapter>();
 builder.Services.AddHttpClient<MTNAdapter>();
 
 // ------------------------
-// Register adapters
+// Register adapters under IPaymentAdapter
 // ------------------------
-builder.Services.AddScoped<AirtelAdapter>();
-builder.Services.AddScoped<MTNAdapter>();
-builder.Services.AddScoped<FNBAdapter>();
-builder.Services.AddScoped<ABSAAdapter>();
-builder.Services.AddScoped<StanbicAdapter>();
-builder.Services.AddScoped<StanchartAdapter>();
+// This allows BankIntegrationService to inject IEnumerable<IPaymentAdapter>
+builder.Services.AddScoped<IPaymentAdapter, AirtelAdapter>();
+builder.Services.AddScoped<IPaymentAdapter, MTNAdapter>();
+builder.Services.AddScoped<IPaymentAdapter, FNBAdapter>();
+builder.Services.AddScoped<IPaymentAdapter, ABSAAdapter>();
+builder.Services.AddScoped<IPaymentAdapter, StanbicAdapter>();
+builder.Services.AddScoped<IPaymentAdapter, StanchartAdapter>();
 
 // ------------------------
 // Build the app
@@ -49,9 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -9,5 +9,8 @@
         public string Reference { get; set; }
         public string Description { get; set; }
         public Dictionary<string, string> AdditionalParameters { get; set; }
+
+        // Add this property so the system knows which provider to use
+        public string Provider { get; set; }
     }
 }
