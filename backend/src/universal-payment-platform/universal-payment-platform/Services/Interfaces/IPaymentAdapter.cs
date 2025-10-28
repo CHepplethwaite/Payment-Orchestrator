@@ -1,6 +1,6 @@
 ﻿namespace universal_payment_platform.Services.Interfaces
 {
-    public interface IPaymentService
+    public interface IPaymentAdapter
     {
     }
 }
