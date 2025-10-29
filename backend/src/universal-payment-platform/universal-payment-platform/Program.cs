@@ -1,6 +1,6 @@
 using universal_payment_platform.Services.Implementations;
 using universal_payment_platform.Services.Interfaces;
-using universal_payment_platform.Services.ThirdPartyBankAdapters;
+using universal_payment_platform.Services.Adapters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +15,6 @@ builder.Services.AddOpenApi();
 // ------------------------
 // Register core services
 // ------------------------
-builder.Services.AddScoped<IBankIntegrationService, BankIntegrationService>();
 builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
 
 // ------------------------

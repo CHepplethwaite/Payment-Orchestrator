@@ -15,7 +15,6 @@ namespace universal_payment_platform.Controllers
             _paymentService = paymentService;
         }
 
-        // POST: /api/payments
         [HttpPost]
         public async Task<IActionResult> ProcessPayment([FromBody] PaymentRequest request)
         {
@@ -26,7 +25,6 @@ namespace universal_payment_platform.Controllers
             return Ok(response);
         }
 
-        // GET: /api/payments/{transactionId}/status?provider=Airtel
         [HttpGet("{transactionId}/status")]
         public async Task<IActionResult> GetPaymentStatus(string transactionId, [FromQuery] string provider)
         {
@@ -35,14 +33,6 @@ namespace universal_payment_platform.Controllers
 
             var response = await _paymentService.GetPaymentStatusAsync(transactionId, provider);
             return Ok(response);
-        }
-
-        // GET: /api/payments/providers
-        [HttpGet("providers")]
-        public async Task<IActionResult> GetSupportedProviders()
-        {
-            var providers = await _paymentService.GetSupportedProvidersAsync();
-            return Ok(providers);
         }
     }
 }

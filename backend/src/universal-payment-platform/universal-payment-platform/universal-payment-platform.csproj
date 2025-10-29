@@ -16,10 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\Logging\" />
-    <Folder Include="Infrastructure\Messaging\" />
     <Folder Include="Infrastructure\Configuration\" />
-    <Folder Include="Infrastructure\Security\" />
   </ItemGroup>
 
 </Project>
