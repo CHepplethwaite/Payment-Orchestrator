@@ -16,7 +16,7 @@ builder.Services.AddOpenApi();
 // Register core services
 // ------------------------
 builder.Services.AddScoped<IBankIntegrationService, BankIntegrationService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
 
 // ------------------------
 // Register HTTP clients for adapters that call external APIs

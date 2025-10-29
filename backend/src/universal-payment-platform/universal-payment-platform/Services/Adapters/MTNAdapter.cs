@@ -1,17 +1,15 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
-using System;
-using System.Threading.Tasks;
 
-namespace universal_payment_platform.Services.ThirdPartyBankAdapters
+namespace universal_payment_platform.Services.Adapters
 {
-    public class AirtelAdapter : IPaymentAdapter
+    public class MTNAdapter : IPaymentAdapter
     {
-        public string GetAdapterName() => "Airtel";
+        public string GetAdapterName() => "MTN";
 
         public Task<AuthResponse> AuthenticateAsync()
         {
-            return Task.FromResult(new AuthResponse { Token = "mock-airtel-token" });
+            return Task.FromResult(new AuthResponse { Token = "mock-mtn-token" });
         }
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
@@ -21,7 +19,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = Guid.NewGuid().ToString(),
                 Status = success ? "Completed" : "Failed",
-                Message = success ? "Airtel payment succeeded" : "Airtel payment failed"
+                Message = success ? "MTN payment succeeded" : "MTN payment failed"
             });
         }
 
@@ -31,7 +29,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = transactionId,
                 Status = "Completed",
-                Message = "Mock Airtel transaction completed"
+                Message = "Mock MTN transaction completed"
             });
         }
     }

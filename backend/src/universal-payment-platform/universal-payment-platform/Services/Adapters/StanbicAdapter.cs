@@ -1,15 +1,15 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.Services.ThirdPartyBankAdapters
+namespace universal_payment_platform.Services.Adapters
 {
-    public class FNBAdapter : IPaymentAdapter
+    public class StanbicAdapter : IPaymentAdapter
     {
-        public string GetAdapterName() => "FNB";
+        public string GetAdapterName() => "Stanbic";
 
         public Task<AuthResponse> AuthenticateAsync()
         {
-            return Task.FromResult(new AuthResponse { Token = "mock-fnb-token" });
+            return Task.FromResult(new AuthResponse { Token = "mock-stanbic-token" });
         }
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
@@ -19,7 +19,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = Guid.NewGuid().ToString(),
                 Status = success ? "Completed" : "Failed",
-                Message = success ? "FNB payment succeeded" : "FNB payment failed"
+                Message = success ? "Stanbic payment succeeded" : "Stanbic payment failed"
             });
         }
 
@@ -29,7 +29,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = transactionId,
                 Status = "Completed",
-                Message = "Mock FNB transaction completed"
+                Message = "Mock Stanbic transaction completed"
             });
         }
     }

@@ -1,15 +1,17 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
+using System;
+using System.Threading.Tasks;
 
-namespace universal_payment_platform.Services.ThirdPartyBankAdapters
+namespace universal_payment_platform.Services.Adapters
 {
-    public class StanchartAdapter : IPaymentAdapter
+    public class AirtelAdapter : IPaymentAdapter
     {
-        public string GetAdapterName() => "Stanchart";
+        public string GetAdapterName() => "Airtel";
 
         public Task<AuthResponse> AuthenticateAsync()
         {
-            return Task.FromResult(new AuthResponse { Token = "mock-stanchart-token" });
+            return Task.FromResult(new AuthResponse { Token = "mock-airtel-token" });
         }
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
@@ -19,7 +21,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = Guid.NewGuid().ToString(),
                 Status = success ? "Completed" : "Failed",
-                Message = success ? "Stanchart payment succeeded" : "Stanchart payment failed"
+                Message = success ? "Airtel payment succeeded" : "Airtel payment failed"
             });
         }
 
@@ -29,7 +31,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = transactionId,
                 Status = "Completed",
-                Message = "Mock Stanchart transaction completed"
+                Message = "Mock Airtel transaction completed"
             });
         }
     }

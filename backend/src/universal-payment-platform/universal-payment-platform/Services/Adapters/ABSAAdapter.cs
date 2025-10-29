@@ -1,15 +1,15 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.Services.ThirdPartyBankAdapters
+namespace universal_payment_platform.Services.Adapters
 {
-    public class StanbicAdapter : IPaymentAdapter
+    public class ABSAAdapter : IPaymentAdapter
     {
-        public string GetAdapterName() => "Stanbic";
+        public string GetAdapterName() => "ABSA";
 
         public Task<AuthResponse> AuthenticateAsync()
         {
-            return Task.FromResult(new AuthResponse { Token = "mock-stanbic-token" });
+            return Task.FromResult(new AuthResponse { Token = "mock-absa-token" });
         }
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
@@ -19,7 +19,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = Guid.NewGuid().ToString(),
                 Status = success ? "Completed" : "Failed",
-                Message = success ? "Stanbic payment succeeded" : "Stanbic payment failed"
+                Message = success ? "ABSA payment succeeded" : "ABSA payment failed"
             });
         }
 
@@ -29,7 +29,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = transactionId,
                 Status = "Completed",
-                Message = "Mock Stanbic transaction completed"
+                Message = "Mock ABSA transaction completed"
             });
         }
     }

@@ -3,12 +3,12 @@ using universal_payment_platform.Services.Interfaces.Models;
 
 namespace universal_payment_platform.Services.Implementations
 {
-    public class PaymentService : IPaymentService
+    public class PaymentOrchestrator : IPaymentService
     {
         private readonly IBankIntegrationService _bankIntegrationService;
         private readonly IEnumerable<IPaymentAdapter> _adapters;
 
-        public PaymentService(IBankIntegrationService bankIntegrationService, IEnumerable<IPaymentAdapter> adapters)
+        public PaymentOrchestrator(IBankIntegrationService bankIntegrationService, IEnumerable<IPaymentAdapter> adapters)
         {
             _bankIntegrationService = bankIntegrationService;
             _adapters = adapters;

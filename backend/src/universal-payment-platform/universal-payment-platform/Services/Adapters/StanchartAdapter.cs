@@ -1,15 +1,15 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.Services.ThirdPartyBankAdapters
+namespace universal_payment_platform.Services.Adapters
 {
-    public class MTNAdapter : IPaymentAdapter
+    public class StanchartAdapter : IPaymentAdapter
     {
-        public string GetAdapterName() => "MTN";
+        public string GetAdapterName() => "Stanchart";
 
         public Task<AuthResponse> AuthenticateAsync()
         {
-            return Task.FromResult(new AuthResponse { Token = "mock-mtn-token" });
+            return Task.FromResult(new AuthResponse { Token = "mock-stanchart-token" });
         }
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
@@ -19,7 +19,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = Guid.NewGuid().ToString(),
                 Status = success ? "Completed" : "Failed",
-                Message = success ? "MTN payment succeeded" : "MTN payment failed"
+                Message = success ? "Stanchart payment succeeded" : "Stanchart payment failed"
             });
         }
 
@@ -29,7 +29,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = transactionId,
                 Status = "Completed",
-                Message = "Mock MTN transaction completed"
+                Message = "Mock Stanchart transaction completed"
             });
         }
     }

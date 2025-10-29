@@ -1,15 +1,15 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.Services.ThirdPartyBankAdapters
+namespace universal_payment_platform.Services.Adapters
 {
-    public class ABSAAdapter : IPaymentAdapter
+    public class FNBAdapter : IPaymentAdapter
     {
-        public string GetAdapterName() => "ABSA";
+        public string GetAdapterName() => "FNB";
 
         public Task<AuthResponse> AuthenticateAsync()
         {
-            return Task.FromResult(new AuthResponse { Token = "mock-absa-token" });
+            return Task.FromResult(new AuthResponse { Token = "mock-fnb-token" });
         }
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
@@ -19,7 +19,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = Guid.NewGuid().ToString(),
                 Status = success ? "Completed" : "Failed",
-                Message = success ? "ABSA payment succeeded" : "ABSA payment failed"
+                Message = success ? "FNB payment succeeded" : "FNB payment failed"
             });
         }
 
@@ -29,7 +29,7 @@ namespace universal_payment_platform.Services.ThirdPartyBankAdapters
             {
                 TransactionId = transactionId,
                 Status = "Completed",
-                Message = "Mock ABSA transaction completed"
+                Message = "Mock FNB transaction completed"
             });
         }
     }
