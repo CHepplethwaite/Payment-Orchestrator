@@ -1,8 +1,15 @@
+using Serilog;
+using universal_payment_platform.Middleware;
+using universal_payment_platform.Services.Adapters;
 using universal_payment_platform.Services.Implementations;
 using universal_payment_platform.Services.Interfaces;
-using universal_payment_platform.Services.Adapters;
+using UniversalPaymentPlatform.Infrastructure.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog early
+LoggerConfig.ConfigureSerilog(builder.Configuration);
+builder.Host.UseSerilog();
 
 // ------------------------
 // Add services to the container
@@ -28,15 +35,14 @@ builder.Services.AddHttpClient<MTNAdapter>();
 // This allows BankIntegrationService to inject IEnumerable<IPaymentAdapter>
 builder.Services.AddScoped<IPaymentAdapter, AirtelAdapter>();
 builder.Services.AddScoped<IPaymentAdapter, MTNAdapter>();
-builder.Services.AddScoped<IPaymentAdapter, FNBAdapter>();
-builder.Services.AddScoped<IPaymentAdapter, ABSAAdapter>();
-builder.Services.AddScoped<IPaymentAdapter, StanbicAdapter>();
-builder.Services.AddScoped<IPaymentAdapter, StanchartAdapter>();
 
 // ------------------------
 // Build the app
 // ------------------------
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // ------------------------
 // Configure middleware

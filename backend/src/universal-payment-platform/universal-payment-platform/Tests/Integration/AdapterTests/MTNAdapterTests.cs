@@ -1,6 +1,6 @@
 ﻿namespace universal_payment_platform.Tests.Integration.AdapterTests
 {
-    public class ABSAAdapterTests
+    public class MTNAdapterTests
     {
     }
 }
