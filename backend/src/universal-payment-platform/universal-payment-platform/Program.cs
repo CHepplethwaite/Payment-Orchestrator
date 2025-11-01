@@ -22,6 +22,7 @@ builder.Services.AddOpenApi();
 // ------------------------
 // Register core services
 // ------------------------
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
 
 // ------------------------
