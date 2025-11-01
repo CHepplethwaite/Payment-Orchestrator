@@ -20,7 +20,7 @@ namespace universal_payment_platform.Services.Adapters
             return Task.FromResult(new PaymentResponse
             {
                 TransactionId = Guid.NewGuid().ToString(),
-                Status = success ? "Completed" : "Failed",
+                Status = success ? PaymentStatus.Success : PaymentStatus.Failed,
                 Message = success ? "Airtel payment succeeded" : "Airtel payment failed"
             });
         }
@@ -30,7 +30,7 @@ namespace universal_payment_platform.Services.Adapters
             return Task.FromResult(new PaymentResponse
             {
                 TransactionId = transactionId,
-                Status = "Completed",
+                Status = PaymentStatus.Success,
                 Message = "Mock Airtel transaction completed"
             });
         }

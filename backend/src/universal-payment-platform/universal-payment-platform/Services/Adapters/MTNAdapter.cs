@@ -18,7 +18,7 @@ namespace universal_payment_platform.Services.Adapters
             return Task.FromResult(new PaymentResponse
             {
                 TransactionId = Guid.NewGuid().ToString(),
-                Status = success ? "Completed" : "Failed",
+                Status = success ? PaymentStatus.Success : PaymentStatus.Failed,
                 Message = success ? "MTN payment succeeded" : "MTN payment failed"
             });
         }
@@ -28,7 +28,7 @@ namespace universal_payment_platform.Services.Adapters
             return Task.FromResult(new PaymentResponse
             {
                 TransactionId = transactionId,
-                Status = "Completed",
+                Status = PaymentStatus.Success,
                 Message = "Mock MTN transaction completed"
             });
         }

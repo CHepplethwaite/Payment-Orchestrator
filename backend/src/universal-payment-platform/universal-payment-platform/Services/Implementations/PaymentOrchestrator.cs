@@ -69,7 +69,7 @@ namespace universal_payment_platform.Services.Implementations
 
                 var response = await _retryPolicy.ExecuteAsync(() => adapter.MakePaymentAsync(request));
 
-                if (response.Status == PaymentStatus.Completed)
+                if (response.Status == PaymentStatus.Success)
                 {
                     _logger.LogInformation(
                         "Payment succeeded for TransactionId {TransactionId} via {Provider}",
@@ -83,7 +83,7 @@ namespace universal_payment_platform.Services.Implementations
                 }
 
                 // Persist transaction (optional)
-                await _transactionService?.SaveTransactionAsync(request, response);
+                await _transactionService.SaveTransactionAsync(request, response);
 
                 return response;
             }
@@ -100,7 +100,7 @@ namespace universal_payment_platform.Services.Implementations
                     Message = $"Exception: {ex.Message}"
                 };
 
-                await _transactionService?.SaveTransactionAsync(request, failedResponse);
+                await _transactionService.SaveTransactionAsync(request, failedResponse);
 
                 return failedResponse;
             }
