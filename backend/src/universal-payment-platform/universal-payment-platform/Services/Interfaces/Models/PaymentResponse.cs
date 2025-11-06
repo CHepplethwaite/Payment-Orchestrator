@@ -2,14 +2,9 @@
 {
     public class PaymentResponse
     {
-        public bool IsSuccess { get; set; }
-        public string? TransactionId { get; set; } = string.Empty;
-        public string Reference { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
+        public string TransactionId { get; set; } = string.Empty;
         public PaymentStatus Status { get; set; }
-        public string StatusCode { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
         public string? ProviderReference { get; set; }
-        public DateTime Timestamp { get; set; }
-        public Dictionary<string, object> AdditionalData { get; set; } = new Dictionary<string, object>();
     }
 }

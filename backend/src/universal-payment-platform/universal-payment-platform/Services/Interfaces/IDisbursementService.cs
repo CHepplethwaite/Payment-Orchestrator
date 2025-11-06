@@ -1,6 +1,12 @@
-﻿namespace universal_payment_platform.Services.Interfaces
+﻿using universal_payment_platform.Services.Interfaces.Models;
+  
+
+// Services/Interfaces/IDisbursementService.cs
+namespace universal_payment_platform.Services.Interfaces
 {
-    public class IDisbursementService
+    public interface IDisbursementService
     {
+        Task<DisbursementResponse> ProcessDisbursementAsync(DisbursementRequest request);
+        Task<DisbursementResponse> GetDisbursementStatusAsync(string transactionId);
     }
 }

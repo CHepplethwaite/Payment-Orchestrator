@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using universal_payment_platform.Services.Interfaces.Models;
 
 namespace universal_payment_platform.Data.Entities
 {
@@ -9,14 +10,31 @@ namespace universal_payment_platform.Data.Entities
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        // The ID from the client/request, for idempotency
+        [Required]
+        [MaxLength(100)]
+        public string ExternalTransactionId { get; set; } = null!;
+
+        // The ID from the provider (e.g., Airtel, MTN)
+        [MaxLength(100)]
+        public string? ProviderTransactionId { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string Provider { get; set; } = null!;
+
         [Required]
         public decimal Amount { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [MaxLength(20)]
+        public string Status { get; set; } = PaymentStatus.Pending.ToString(); // Use enum/string
+
+        public string? Message { get; set; } // Store failure messages
 
         [Required]
-        public string Status { get; set; } = "Pending";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
 
         // Relationship to ApplicationUser
         [Required]

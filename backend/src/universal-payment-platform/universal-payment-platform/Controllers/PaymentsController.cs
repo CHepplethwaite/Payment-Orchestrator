@@ -1,18 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using universal_payment_platform.Services.Interfaces;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims; // For getting User ID
+using universal_payment_platform.CQRS.Commands.Requests;
+using universal_payment_platform.CQRS.Queries.Requests;
 using universal_payment_platform.Services.Interfaces.Models;
 
 namespace universal_payment_platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Require authentication for all payment actions
     public class PaymentsController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
+        // Inject MediatR instead of IPaymentService
+        private readonly IMediator _mediator;
 
-        public PaymentsController(IPaymentService paymentService)
+        public PaymentsController(IMediator mediator)
         {
-            _paymentService = paymentService;
+            _mediator = mediator;
+        }
+
+        private string GetUserId()
+        {
+            // Get the user ID from the JWT token
+            return User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                   throw new BadHttpRequestException("User ID not found in token.");
         }
 
         [HttpPost]
@@ -21,7 +34,15 @@ namespace universal_payment_platform.Controllers
             if (string.IsNullOrEmpty(request.Provider))
                 return BadRequest("Provider must be specified.");
 
-            var response = await _paymentService.ProcessPaymentAsync(request, request.Provider);
+            var userId = GetUserId(); // Get authenticated user's ID
+
+            // Create and send the command
+            var command = new CreatePaymentCommand(request, request.Provider, userId);
+            var response = await _mediator.Send(command);
+
+            if (response.Status == PaymentStatus.Failed)
+                return BadRequest(response); // Or Ok(response) depending on your API contract
+
             return Ok(response);
         }
 
@@ -31,7 +52,10 @@ namespace universal_payment_platform.Controllers
             if (string.IsNullOrEmpty(provider))
                 return BadRequest("Provider must be specified.");
 
-            var response = await _paymentService.GetPaymentStatusAsync(transactionId, provider);
+            // Create and send the query
+            var query = new GetPaymentQuery(transactionId, provider);
+            var response = await _mediator.Send(query);
+
             return Ok(response);
         }
     }

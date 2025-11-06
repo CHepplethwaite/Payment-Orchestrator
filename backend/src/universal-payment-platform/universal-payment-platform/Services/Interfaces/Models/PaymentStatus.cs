@@ -5,7 +5,6 @@
         Pending,
         Success,
         Failed,
-        Cancelled,
-        InProgress
+        Processing
     }
 }

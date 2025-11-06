@@ -1,12 +1,13 @@
 ﻿using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
-using System;
-using System.Threading.Tasks;
 
 namespace universal_payment_platform.Services.Adapters
 {
     public class AirtelAdapter : IPaymentAdapter
     {
+        // Reuse a single Random instance to avoid repeated false results
+        private static readonly Random _random = new Random();
+
         public string GetAdapterName() => "Airtel";
 
         public Task<AuthResponse> AuthenticateAsync()
@@ -16,7 +17,8 @@ namespace universal_payment_platform.Services.Adapters
 
         public Task<PaymentResponse> MakePaymentAsync(PaymentRequest request)
         {
-            var success = new Random().Next(0, 2) == 1;
+            // 80% success rate instead of 50%
+            var success = _random.Next(0, 10) < 8;
             return Task.FromResult(new PaymentResponse
             {
                 TransactionId = Guid.NewGuid().ToString(),

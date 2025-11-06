@@ -1,4 +1,3 @@
-using universal_payment_platform.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,11 +5,15 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
 using universal_payment_platform.Data.Entities;
+using universal_payment_platform.Infrastructure.Security;
 using universal_payment_platform.Middleware;
+using universal_payment_platform.Repositories.Implementations; // ADDED: For PaymentRepository
+using universal_payment_platform.Repositories.Interfaces; // ADDED: For IPaymentRepository
 using universal_payment_platform.Services.Adapters;
-using universal_payment_platform.Services.Implementations;
-using universal_payment_platform.Services.Interfaces;
+// REMOVED: using universal_payment_platform.Services.Implementations; (Replaced by CQRS Handlers)
+// REMOVED: using universal_payment_platform.Services.Interfaces; (Replaced by MediatR commands/queries)
 using UniversalPaymentPlatform.Infrastructure.Logging;
+using universal_payment_platform.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,15 +66,30 @@ builder.Services.AddSingleton<JwtTokenProvider>();
 // Add controllers
 builder.Services.AddControllers();
 
-// Register core services
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
+// --- REFACTORED SERVICE REGISTRATION (CQRS) ---
+
+// REMOVED: Old Service-based registrations
+// builder.Services.AddScoped<ITransactionService, TransactionService>();
+// builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
+
+// ADDED: Register MediatR to find all Handlers, Commands, and Queries
+// This scans your entire project assembly for IRequestHandler, etc.
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// ADDED: Register the Repository for database access
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+// Note: You can also register your other empty repositories here if you plan to use them
+// builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+// --- END REFACTORED SERVICES ---
 
 // Register HTTP clients for adapters
 builder.Services.AddHttpClient<AirtelAdapter>();
-builder.Services.AddHttpClient<MTNAdapter>();
+builder.Services.AddHttpClient<MTNAdapter>(); // Assuming MTNAdapter also needs an HttpClient
 
 // Register adapters as IPaymentAdapter implementations
+// This is still needed so MediatR handlers can inject IEnumerable<IPaymentAdapter>
 builder.Services.AddScoped<IPaymentAdapter, AirtelAdapter>();
 builder.Services.AddScoped<IPaymentAdapter, MTNAdapter>();
 
