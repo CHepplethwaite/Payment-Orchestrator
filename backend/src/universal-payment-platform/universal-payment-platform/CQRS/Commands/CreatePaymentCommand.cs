@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.CQRS.Commands.Requests
+namespace universal_payment_platform.CQRS.Commands
 {
     // This command encapsulates the payment request and will return a PaymentResponse
     public class CreatePaymentCommand : IRequest<PaymentResponse>

@@ -1,13 +1,12 @@
 ﻿using MediatR;
 using Polly;
 using Polly.Retry;
-using universal_payment_platform.CQRS.Commands.Requests;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.CQRS.Commands.Handlers
+namespace universal_payment_platform.CQRS.Commands
 {
     public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, PaymentResponse>
     {

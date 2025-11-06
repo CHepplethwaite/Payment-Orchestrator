@@ -1,8 +1,7 @@
 ﻿using MediatR;
-using universal_payment_platform.CQRS.Queries;
 using universal_payment_platform.Services.Interfaces;
 
-namespace universal_payment_platform.CQRS.Handlers
+namespace universal_payment_platform.CQRS.Queries
 {
     public class GetSupportedProvidersQueryHandler
         : IRequestHandler<GetSupportedProvidersQuery, IEnumerable<string>>

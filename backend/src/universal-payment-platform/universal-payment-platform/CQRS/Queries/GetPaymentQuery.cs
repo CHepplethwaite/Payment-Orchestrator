@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using universal_payment_platform.Services.Interfaces.Models;
 
-namespace universal_payment_platform.CQRS.Queries.Requests
+namespace universal_payment_platform.CQRS.Queries
 {
     public class GetPaymentQuery : IRequest<PaymentResponse>
     {
