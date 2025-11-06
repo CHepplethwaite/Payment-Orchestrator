@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using universal_payment_platform.Services.Interfaces;
+using MediatR;
+using universal_payment_platform.CQRS.Queries;
 
 namespace universal_payment_platform.Controllers
 {
@@ -7,17 +8,22 @@ namespace universal_payment_platform.Controllers
     [Route("api/[controller]")]
     public class ProvidersController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
+        private readonly IMediator _mediator;
 
-        public ProvidersController(IPaymentService paymentService)
+        public ProvidersController(IMediator mediator)
         {
-            _paymentService = paymentService;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetSupportedProviders()
         {
-            var providers = await _paymentService.GetSupportedProvidersAsync();
+            // Create a query to get providers
+            var query = new GetSupportedProvidersQuery();
+
+            // Send the query through MediatR
+            var providers = await _mediator.Send(query);
+
             return Ok(providers);
         }
     }
