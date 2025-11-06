@@ -1,10 +1,10 @@
+using universal_payment_platform.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
-using universal_payment_platform.Data;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Middleware;
 using universal_payment_platform.Services.Adapters;
@@ -14,15 +14,11 @@ using UniversalPaymentPlatform.Infrastructure.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ------------------------
 // Configure Serilog early
-// ------------------------
 LoggerConfig.ConfigureSerilog(builder.Configuration);
 builder.Host.UseSerilog();
 
-// ------------------------
 // Configure PostgreSQL + Identity
-// ------------------------
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -37,9 +33,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// ------------------------
 // Configure JWT Authentication
-// ------------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]
     ?? throw new InvalidOperationException("Missing JWT Key in configuration"));
@@ -63,95 +57,71 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ------------------------
+// Register JwtTokenProvider
+builder.Services.AddSingleton<JwtTokenProvider>();
+
 // Add controllers
-// ------------------------
 builder.Services.AddControllers();
 
-// ------------------------
 // Register core services
-// ------------------------
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
 
-// ------------------------
 // Register HTTP clients for adapters
-// ------------------------
 builder.Services.AddHttpClient<AirtelAdapter>();
 builder.Services.AddHttpClient<MTNAdapter>();
 
-// ------------------------
 // Register adapters as IPaymentAdapter implementations
-// ------------------------
 builder.Services.AddScoped<IPaymentAdapter, AirtelAdapter>();
 builder.Services.AddScoped<IPaymentAdapter, MTNAdapter>();
 
 var app = builder.Build();
 
-// ------------------------
-// Apply database migrations automatically (optional but useful)
-// ------------------------
+// Apply database migrations automatically
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 
-    // Optionally seed default roles (Admin, Developer, User)
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Admin", "Developer", "User" };
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-            await roleManager.CreateAsync(new IdentityRole(role));
-    }
+    await SeedData.InitializeRoles(roleManager);
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    await SeedData.InitializeSuperAdmin(userManager, roleManager); // Create first super admin
 }
 
-// ------------------------
-// Global Middlewares
-// ------------------------
+// Global middlewares
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-// ------------------------
-// Secure HTTP headers (no duplicate warnings)
-// ------------------------
+// Secure HTTP headers
 app.Use(async (context, next) =>
 {
     var headers = context.Response.Headers;
-
     headers.Append("X-Content-Type-Options", "nosniff");
     headers.Append("X-Frame-Options", "DENY");
     headers.Append("X-XSS-Protection", "1; mode=block");
     headers.Append("Referrer-Policy", "no-referrer");
     headers.Append("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
     headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
-
     await next();
 });
 
-// ------------------------
-// Conditionally use HTTPS only if configured
-// ------------------------
+// HTTPS if configured
 var httpsUrl = builder.Configuration["urls"]?.Split(';').FirstOrDefault(u => u.StartsWith("https://"));
 if (!string.IsNullOrEmpty(httpsUrl))
 {
     app.UseHttpsRedirection();
 }
 
-// ------------------------
-// Enable Authentication & Authorization
-// ------------------------
+// Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ------------------------
-// Map Controllers
-// ------------------------
+// Map controllers
 app.MapControllers();
 
-// ------------------------
-// Simple Health Check Root Endpoint
-// ------------------------
+// Health check
 app.MapGet("/", () => Results.Ok(new
 {
     status = "ok",

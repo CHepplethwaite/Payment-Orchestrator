@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using universal_payment_platform.Data;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using universal_payment_platform.Data.Entities;
-using Microsoft.AspNetCore.Identity;
+using universal_payment_platform.Infrastructure.Security;
 
 namespace universal_payment_platform.Controllers
 {
@@ -14,19 +9,24 @@ namespace universal_payment_platform.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _config;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly JwtTokenProvider _jwtProvider;
 
-        public AuthController(ApplicationDbContext context, IConfiguration config)
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            JwtTokenProvider jwtProvider)
         {
-            _context = context;
-            _config = config;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _jwtProvider = jwtProvider;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            if (await _userManager.FindByEmailAsync(request.Email) != null)
                 return BadRequest("Email already exists.");
 
             var user = new ApplicationUser
@@ -35,59 +35,35 @@ namespace universal_payment_platform.Controllers
                 Email = request.Email
             };
 
-            var passwordHasher = new PasswordHasher<ApplicationUser>();
-            user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var publicRole = "EndUser";
 
-            return Ok("User registered successfully");
+            if (!await _roleManager.RoleExistsAsync(publicRole))
+                await _roleManager.CreateAsync(new IdentityRole(publicRole));
+
+            await _userManager.AddToRoleAsync(user, publicRole);
+
+            return Ok(new { Message = "User registered successfully", Role = publicRole });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
-            if (string.IsNullOrEmpty(user.PasswordHash))
+            var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+            if (!passwordValid)
                 return Unauthorized("Invalid email or password");
 
-            var passwordHasher = new PasswordHasher<ApplicationUser>();
-            var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _jwtProvider.GenerateToken(user, roles);
 
-            if (result == PasswordVerificationResult.Failed)
-                return Unauthorized("Invalid email or password");
-
-            var token = GenerateJwtToken(user);
             return Ok(new { Token = token });
-        }
-
-        private string GenerateJwtToken(ApplicationUser user)
-        {
-            var jwtKey = _config["Jwt:Key"];
-            if (string.IsNullOrEmpty(jwtKey))
-                throw new InvalidOperationException("JWT Key is missing in configuration (Jwt:Key)");
-
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-                new Claim("role", "User")
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                _config["Jwt:Issuer"],
-                _config["Jwt:Audience"],
-                claims,
-                expires: DateTime.UtcNow.AddHours(2),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public class RegisterRequest

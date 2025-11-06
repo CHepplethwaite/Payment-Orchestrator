@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using universal_payment_platform.Data.Entities;
 
-namespace universal_payment_platform.Data
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
+    }
 
         // ------------------------
         // DbSets for your entities
@@ -65,5 +64,5 @@ namespace universal_payment_platform.Data
                 .Property(t => t.Amount)
                 .HasPrecision(18, 2);
         }
-    }
+    
 }
