@@ -31,7 +31,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             builder.Entity<Payment>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Payments)
-                .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ApplicationUser → Transactions

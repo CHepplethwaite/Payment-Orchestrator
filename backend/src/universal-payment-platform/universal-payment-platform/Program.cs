@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using universal_payment_platform.Infrastructure.PipelineBehaviors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,13 +8,14 @@ using System.Text;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Infrastructure.Security;
 using universal_payment_platform.Middleware;
-using universal_payment_platform.Repositories.Implementations; // ADDED: For PaymentRepository
-using universal_payment_platform.Repositories.Interfaces; // ADDED: For IPaymentRepository
+using universal_payment_platform.Repositories.Implementations;
+using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Adapters;
-// REMOVED: using universal_payment_platform.Services.Implementations; (Replaced by CQRS Handlers)
-// REMOVED: using universal_payment_platform.Services.Interfaces; (Replaced by MediatR commands/queries)
-using UniversalPaymentPlatform.Infrastructure.Logging;
 using universal_payment_platform.Services.Interfaces;
+using universal_payment_platform.Validators;
+using UniversalPaymentPlatform.Infrastructure.Logging;
+using MediatR; // Ensure MediatR is in scope for the behavior registration
+using FluentValidation; // Ensure FluentValidation is in scope
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,33 +65,35 @@ builder.Services.AddAuthentication(options =>
 // Register JwtTokenProvider
 builder.Services.AddSingleton<JwtTokenProvider>();
 
-// Add controllers
+// Add controllers 
+// --- CRITICAL FIX START ---
+// We REMOVE .AddFluentValidation() from AddControllers(). This stops the pre-action validation.
 builder.Services.AddControllers();
+
+// Register all validators from the assembly (necessary for MediatR behavior to find them)
+builder.Services.AddValidatorsFromAssemblyContaining<PaymentRequestValidator>();
+// --- CRITICAL FIX END ---
 
 // --- REFACTORED SERVICE REGISTRATION (CQRS) ---
 
-// REMOVED: Old Service-based registrations
-// builder.Services.AddScoped<ITransactionService, TransactionService>();
-// builder.Services.AddScoped<IPaymentService, PaymentOrchestrator>();
-
-// ADDED: Register MediatR to find all Handlers, Commands, and Queries
-// This scans your entire project assembly for IRequestHandler, etc.
+// Register MediatR for Commands & Queries
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 
-// ADDED: Register the Repository for database access
+    // --- CRITICAL ADDITION: Inject the ValidationBehavior into the pipeline.
+    // This ensures validation only runs *after* the controller has a chance to execute.
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
+
+// Register repositories
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-// Note: You can also register your other empty repositories here if you plan to use them
-// builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-
-// --- END REFACTORED SERVICES ---
 
 // Register HTTP clients for adapters
 builder.Services.AddHttpClient<AirtelAdapter>();
-builder.Services.AddHttpClient<MTNAdapter>(); // Assuming MTNAdapter also needs an HttpClient
+builder.Services.AddHttpClient<MTNAdapter>();
 
 // Register adapters as IPaymentAdapter implementations
-// This is still needed so MediatR handlers can inject IEnumerable<IPaymentAdapter>
 builder.Services.AddScoped<IPaymentAdapter, AirtelAdapter>();
 builder.Services.AddScoped<IPaymentAdapter, MTNAdapter>();
 
@@ -105,7 +109,7 @@ using (var scope = app.Services.CreateScope())
     await SeedData.InitializeRoles(roleManager);
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    await SeedData.InitializeSuperAdmin(userManager, roleManager); // Create first super admin
+    await SeedData.InitializeSuperAdmin(userManager, roleManager);
 }
 
 // Global middlewares

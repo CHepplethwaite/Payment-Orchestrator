@@ -3,80 +3,69 @@ using Microsoft.AspNetCore.Mvc;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Infrastructure.Security;
 
-namespace universal_payment_platform.Controllers
+namespace universal_payment_platform.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController(
+    UserManager<ApplicationUser> _userManager,
+    RoleManager<IdentityRole> _roleManager,
+    JwtTokenProvider _jwtProvider
+) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly JwtTokenProvider _jwtProvider;
+        if (await _userManager.FindByEmailAsync(request.Email) != null)
+            return BadRequest("Email already exists.");
 
-        public AuthController(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            JwtTokenProvider jwtProvider)
+        var user = new ApplicationUser
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _jwtProvider = jwtProvider;
-        }
+            UserName = request.Username,
+            Email = request.Email
+        };
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            if (await _userManager.FindByEmailAsync(request.Email) != null)
-                return BadRequest("Email already exists.");
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
 
-            var user = new ApplicationUser
-            {
-                UserName = request.Username,
-                Email = request.Email
-            };
+        const string publicRole = "EndUser";
 
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+        if (!await _roleManager.RoleExistsAsync(publicRole))
+            await _roleManager.CreateAsync(new IdentityRole(publicRole));
 
-            var publicRole = "EndUser";
+        await _userManager.AddToRoleAsync(user, publicRole);
 
-            if (!await _roleManager.RoleExistsAsync(publicRole))
-                await _roleManager.CreateAsync(new IdentityRole(publicRole));
+        return Ok(new { Message = "User registered successfully", Role = publicRole });
+    }
 
-            await _userManager.AddToRoleAsync(user, publicRole);
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return Unauthorized("Invalid email or password");
 
-            return Ok(new { Message = "User registered successfully", Role = publicRole });
-        }
+        var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+        if (!passwordValid)
+            return Unauthorized("Invalid email or password");
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
-                return Unauthorized("Invalid email or password");
+        var roles = await _userManager.GetRolesAsync(user);
+        var token = _jwtProvider.GenerateToken(user, roles);
 
-            var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-            if (!passwordValid)
-                return Unauthorized("Invalid email or password");
+        return Ok(new { Token = token });
+    }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = _jwtProvider.GenerateToken(user, roles);
+    public class RegisterRequest
+    {
+        public string Username { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
+    }
 
-            return Ok(new { Token = token });
-        }
-
-        public class RegisterRequest
-        {
-            public string Username { get; set; } = null!;
-            public string Email { get; set; } = null!;
-            public string Password { get; set; } = null!;
-        }
-
-        public class LoginRequest
-        {
-            public string Email { get; set; } = null!;
-            public string Password { get; set; } = null!;
-        }
+    public class LoginRequest
+    {
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
     }
 }

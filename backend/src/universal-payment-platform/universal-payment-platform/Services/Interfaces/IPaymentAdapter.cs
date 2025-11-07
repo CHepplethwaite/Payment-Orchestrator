@@ -1,4 +1,5 @@
-﻿using universal_payment_platform.Services.Interfaces.Models;
+﻿using universal_payment_platform.DTOs.Requests;
+using universal_payment_platform.DTOs.Responses;
 
 namespace universal_payment_platform.Services.Interfaces
 {

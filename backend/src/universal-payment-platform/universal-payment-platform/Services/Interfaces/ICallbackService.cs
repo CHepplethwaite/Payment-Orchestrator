@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using universal_payment_platform.Services.Interfaces.Models;
 
 namespace universal_payment_platform.Services.Interfaces
 {

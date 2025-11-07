@@ -2,7 +2,8 @@
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Interfaces;
-using universal_payment_platform.Services.Interfaces.Models;
+using universal_payment_platform.DTOs.Responses;
+using universal_payment_platform.Common;
 
 namespace universal_payment_platform.CQRS.Queries
 {
@@ -11,7 +12,6 @@ namespace universal_payment_platform.CQRS.Queries
         private readonly IEnumerable<IPaymentAdapter> _adapters;
         private readonly IPaymentRepository _paymentRepository;
         private readonly ILogger<GetPaymentQueryHandler> _logger;
-        // You can add the retry policy here too
 
         public GetPaymentQueryHandler(
             IEnumerable<IPaymentAdapter> adapters,
@@ -38,9 +38,10 @@ namespace universal_payment_platform.CQRS.Queries
                 return new PaymentResponse
                 {
                     TransactionId = payment.ExternalTransactionId,
-                    Status = Enum.Parse<PaymentStatus>(payment.Status),
-                    Message = payment.Message,
-                    ProviderReference = payment.ProviderTransactionId
+                    Status = Enum.Parse<PaymentStatus>(payment.Status!),
+                    Message = payment.Message ?? string.Empty,
+                    ProviderReference = payment.ProviderTransactionId ?? string.Empty,
+                    Currency = payment.Currency ?? "ZMW"
                 };
             }
 
@@ -55,7 +56,9 @@ namespace universal_payment_platform.CQRS.Queries
                 {
                     TransactionId = query.TransactionId,
                     Status = PaymentStatus.Failed,
-                    Message = $"No adapter found for provider {query.Provider}"
+                    Message = $"No adapter found for provider {query.Provider}",
+                    ProviderReference = string.Empty,
+                    Currency = "ZMW"
                 };
             }
 
@@ -69,7 +72,7 @@ namespace universal_payment_platform.CQRS.Queries
                 // 3. Update our database with the new status
                 if (payment == null)
                 {
-                    // This is unusual, but we can create a record now
+                    // Create a new record
                     payment = new Payment
                     {
                         ExternalTransactionId = query.TransactionId,
@@ -77,7 +80,7 @@ namespace universal_payment_platform.CQRS.Queries
                         Status = response.Status.ToString(),
                         Message = response.Message,
                         ProviderTransactionId = response.ProviderReference,
-                        UserId = "UNKNOWN" // We don't know the user at this point
+                        Currency = response.Currency // make sure Payment entity has Currency
                     };
                     await _paymentRepository.AddAsync(payment);
                 }
@@ -86,10 +89,19 @@ namespace universal_payment_platform.CQRS.Queries
                     payment.Status = response.Status.ToString();
                     payment.Message = response.Message;
                     payment.ProviderTransactionId = response.ProviderReference;
+                    payment.Currency = response.Currency;
                     await _paymentRepository.UpdateAsync(payment);
                 }
 
-                return response;
+                // Return response with all required fields
+                return new PaymentResponse
+                {
+                    TransactionId = response.TransactionId,
+                    Status = response.Status,
+                    Message = response.Message,
+                    ProviderReference = response.ProviderReference ?? string.Empty,
+                    Currency = response.Currency ?? "ZMW"
+                };
             }
             catch (Exception ex)
             {
@@ -98,7 +110,9 @@ namespace universal_payment_platform.CQRS.Queries
                 {
                     TransactionId = query.TransactionId,
                     Status = PaymentStatus.Failed,
-                    Message = $"Exception: {ex.Message}"
+                    Message = $"Exception: {ex.Message}",
+                    ProviderReference = string.Empty,
+                    Currency = "ZMW"
                 };
             }
         }
