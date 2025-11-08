@@ -14,8 +14,9 @@ using universal_payment_platform.Services.Adapters;
 using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Validators;
 using UniversalPaymentPlatform.Infrastructure.Logging;
-using MediatR; // Ensure MediatR is in scope for the behavior registration
-using FluentValidation; // Ensure FluentValidation is in scope
+using MediatR;
+using FluentValidation;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,31 +66,24 @@ builder.Services.AddAuthentication(options =>
 // Register JwtTokenProvider
 builder.Services.AddSingleton<JwtTokenProvider>();
 
-// Add controllers 
-// --- CRITICAL FIX START ---
-// We REMOVE .AddFluentValidation() from AddControllers(). This stops the pre-action validation.
+// Add controllers without automatic FluentValidation integration
 builder.Services.AddControllers();
 
-// Register all validators from the assembly (necessary for MediatR behavior to find them)
+// Register all validators from the assembly
 builder.Services.AddValidatorsFromAssemblyContaining<PaymentRequestValidator>();
-// --- CRITICAL FIX END ---
 
-// --- REFACTORED SERVICE REGISTRATION (CQRS) ---
-
-// Register MediatR for Commands & Queries
+// --- MediatR setup ---
+// Registers all IRequestHandler<,> in this assembly
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-
-    // --- CRITICAL ADDITION: Inject the ValidationBehavior into the pipeline.
-    // This ensures validation only runs *after* the controller has a chance to execute.
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
-// Register repositories
+// Repositories
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
-// Register HTTP clients for adapters
+// HTTP clients for adapters
 builder.Services.AddHttpClient<AirtelAdapter>();
 builder.Services.AddHttpClient<MTNAdapter>();
 
@@ -129,7 +123,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// HTTPS if configured
+// HTTPS redirection if configured
 var httpsUrl = builder.Configuration["urls"]?.Split(';').FirstOrDefault(u => u.StartsWith("https://"));
 if (!string.IsNullOrEmpty(httpsUrl))
 {

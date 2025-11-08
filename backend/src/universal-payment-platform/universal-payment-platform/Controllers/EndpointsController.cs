@@ -8,15 +8,10 @@ namespace universal_payment_platform.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "SuperAdmin,Developer,Admin")] // Only allow authorized developers/admins
-    public class EndpointsController : ControllerBase
+    public class EndpointsController(IApiDescriptionGroupCollectionProvider provider) : ControllerBase
     {
-        private readonly IApiDescriptionGroupCollectionProvider _provider;
+        private readonly IApiDescriptionGroupCollectionProvider _provider = provider;
         private static readonly ConcurrentDictionary<string, List<EndpointInfo>> _cachedEndpoints = new();
-
-        public EndpointsController(IApiDescriptionGroupCollectionProvider provider)
-        {
-            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        }
 
         [HttpGet]
         public IActionResult GetAll()

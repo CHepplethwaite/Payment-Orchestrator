@@ -2,8 +2,7 @@
 
 using MediatR;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation; // <-- NEW: Required for [ValidateNever]
-using universal_payment_platform.DTOs.Responses;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation; // Required for [ValidateNever]
 
 namespace universal_payment_platform.CQRS.Commands
 {
@@ -11,21 +10,21 @@ namespace universal_payment_platform.CQRS.Commands
     public class PaymentRequestCommand : IRequest<PaymentResponse>
     {
         // These fields are bound directly from the JSON request body
-        public string Provider { get; set; }
+        public required string Provider { get; set; }
         public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public string Description { get; set; }
+        public required string Currency { get; set; }
+        public required string Description { get; set; }
 
-        // JWT user ID — Must be decorated with:
-        // 1. [JsonIgnore] to prevent clients from setting it via the body.
-        // 2. [ValidateNever] to skip ASP.NET Core's initial validation (allowing controller code to run).
+        // JWT user ID — set internally from the token, not from the JSON body
         [JsonIgnore]
-        [ValidateNever] // <--- CRITICAL FIX
-        public string UserId { get; set; }
+        [ValidateNever]
+        public string UserId { get; set; } = string.Empty; // removed 'required'
 
+        // Parameterless constructor for deserialization
         public PaymentRequestCommand() { }
 
-        public PaymentRequestCommand(string provider, decimal amount, string currency, string description, string userId = null)
+        // Optional constructor for manual instantiation (internal use)
+        public PaymentRequestCommand(string provider, decimal amount, string currency, string description, string userId)
         {
             Provider = provider;
             Amount = amount;

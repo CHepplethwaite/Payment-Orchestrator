@@ -4,9 +4,8 @@ using Polly.Retry;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Interfaces;
-using universal_payment_platform.DTOs.Responses;
-using universal_payment_platform.DTOs.Requests;
 using universal_payment_platform.Common;
+using universal_payment_platform.DTOs.@public;
 
 namespace universal_payment_platform.CQRS.Commands
 {
