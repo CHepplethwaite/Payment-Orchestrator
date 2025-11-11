@@ -1,6 +1,9 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.PayLink.Responses
+﻿public class LinkDto
 {
-    public class LinkDto
-    {
-    }
+    public SelfLinkDto Self { get; set; }
+}
+
+public class SelfLinkDto
+{
+    public string Href { get; set; }
 }

@@ -1,6 +1,5 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.PayLink.Requests
+﻿public class AdditionalInformationDto
 {
-    public class AdditionalInformationDto
-    {
-    }
+    public string Key { get; set; }
+    public string Value { get; set; }
 }

@@ -1,6 +1,5 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.PayLink.Requests
+﻿public class MoneyDto
 {
-    public class MoneyDto
-    {
-    }
+    public decimal Amount { get; set; }
+    public string Units { get; set; }
 }
