@@ -1,4 +1,4 @@
-﻿public class LinkDto
+﻿public class LinksDto
 {
     public SelfLinkDto Self { get; set; }
 }
