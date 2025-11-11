@@ -1,6 +1,13 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Requests
+﻿using System.Text.Json.Serialization;
+
+namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
 {
-    public class MTNMonetaryAmountDto
+    public record MTNMonetaryAmountDto
     {
+        [JsonPropertyName("amount")]
+        public required decimal Amount { get; init; }
+
+        [JsonPropertyName("units")]
+        public required string Units { get; init; }
     }
 }

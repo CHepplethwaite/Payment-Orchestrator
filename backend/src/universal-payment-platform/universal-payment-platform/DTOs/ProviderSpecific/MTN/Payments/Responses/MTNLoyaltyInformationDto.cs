@@ -1,6 +1,16 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Responses
+﻿using System.Text.Json.Serialization;
+
+namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Responses
 {
-    public class MTNLoyaltyInformationDto
+    public record MTNLoyaltyInformationDto
     {
+        [JsonPropertyName("points")]
+        public decimal? Points { get; init; }
+
+        [JsonPropertyName("tier")]
+        public string? Tier { get; init; }
+
+        [JsonPropertyName("expiryDate")]
+        public string? ExpiryDate { get; init; }
     }
 }

@@ -35,7 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\ProviderSpecific\MTN\Payments\Responses\" />
+    <Folder Include="DTOs\ProviderSpecific\MTN\PayLink\Responses\" />
+    <Folder Include="DTOs\ProviderSpecific\MTN\PayLink\Requests\" />
   </ItemGroup>
 
 </Project>

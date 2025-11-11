@@ -1,6 +1,8 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.History.Responses
+﻿namespace Application.DTOs.Payments.Responses
 {
     public class MoneyDto
     {
+        public decimal Amount { get; set; }
+        public string Units { get; set; } = string.Empty;
     }
 }

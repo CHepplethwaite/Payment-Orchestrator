@@ -1,6 +1,13 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Responses
+﻿using System.Text.Json.Serialization;
+
+namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Responses
 {
-    public class MTNPaymentLinksDto
+    public record MTNPaymentLinksDto
     {
+        [JsonPropertyName("self")]
+        public string? Self { get; init; }
+
+        [JsonPropertyName("related")]
+        public string? Related { get; init; }
     }
 }
