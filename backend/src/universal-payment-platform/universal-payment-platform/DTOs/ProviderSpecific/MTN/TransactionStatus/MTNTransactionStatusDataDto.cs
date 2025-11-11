@@ -14,7 +14,7 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN
         public string? CustomerId { get; init; }
 
         [JsonPropertyName("status")]
-        public string? Status { get; init; } // e.g., Success, Pending, Failed
+        public string? Status { get; init; }
 
         [JsonPropertyName("description")]
         public string? Description { get; init; }
