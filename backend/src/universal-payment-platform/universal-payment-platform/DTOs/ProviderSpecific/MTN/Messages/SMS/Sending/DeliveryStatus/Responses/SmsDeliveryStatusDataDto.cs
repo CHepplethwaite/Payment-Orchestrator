@@ -1,9 +1,16 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Messages.SMS.DeliveryStatus.Responses;
-using System.Collections.Generic;
+﻿using System.Text.Json.Serialization;
 
-public record SmsDeliveryStatusDataDto(
-    string RequestId,                                  // Request ID returned during sending
-    string ClientCorrelator,                          // Client-provided correlator
-    List<SmsDeliveryStatusItemDto> DeliveryStatus,    // Array of status objects
-    LinkDto Links                                     // _link object for self-reference
-);
+public record SmsDeliveryStatusDataDto
+{
+    [JsonPropertyName("requestId")]
+    public string RequestId { get; init; }
+
+    [JsonPropertyName("clientCorrelator")]
+    public string ClientCorrelator { get; init; }
+
+    [JsonPropertyName("deliveryStatus")]
+    public List<SmsDeliveryStatusItemDto> DeliveryStatus { get; init; }
+
+    [JsonPropertyName("links")]
+    public LinkDto Links { get; init; }
+}

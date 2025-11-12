@@ -1,9 +1,13 @@
-﻿public class LinkDto
+﻿using System.Text.Json.Serialization;
+
+public record LinkDto
 {
-    public SelfLinkDto Self { get; set; }
+    [JsonPropertyName("self")]
+    public SelfLinkDto Self { get; init; }
 }
 
-public class SelfLinkDto
+public record SelfLinkDto
 {
-    public string Href { get; set; }
+    [JsonPropertyName("href")]
+    public string Href { get; init; }
 }

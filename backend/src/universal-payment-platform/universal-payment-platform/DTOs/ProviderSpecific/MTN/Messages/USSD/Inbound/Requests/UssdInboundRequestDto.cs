@@ -1,10 +1,28 @@
-﻿public record UssdInboundRequestDto(
-    string SessionId,       // Unique identifier of the session
-    string MessageType,     // 0-Begin|1-Continue|2-End|3-Notification|4-Cancel|5-Timeout
-    string Msisdn,          // Mobile number of the recipient
-    string ServiceCode,     // USSD service code
-    string UssdString,      // USSD message content
-    string CellId,          // Subscriber's GSM Cell ID
-    string Language,        // Subscriber's language preference
-    string Imsi             // Subscriber's IMSI
-);
+﻿using System.Text.Json.Serialization;
+
+public record UssdInboundRequestDto
+{
+    [JsonPropertyName("sessionId")]
+    public string SessionId { get; init; }
+
+    [JsonPropertyName("messageType")]
+    public string MessageType { get; init; }
+
+    [JsonPropertyName("msisdn")]
+    public string Msisdn { get; init; }
+
+    [JsonPropertyName("serviceCode")]
+    public string ServiceCode { get; init; }
+
+    [JsonPropertyName("ussdString")]
+    public string UssdString { get; init; }
+
+    [JsonPropertyName("cellId")]
+    public string CellId { get; init; }
+
+    [JsonPropertyName("language")]
+    public string Language { get; init; }
+
+    [JsonPropertyName("imsi")]
+    public string Imsi { get; init; }
+}

@@ -1,7 +1,13 @@
-﻿namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.SMS.Delivery
+﻿using System.Text.Json.Serialization;
+
+namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.SMS.Delivery
 {
-    public record SmsDeliveryNotificationSubscriptionDataDto(
-        string SubscriptionId, // Unique identifier of the subscription
-        LinkDto Links          // _link object containing self reference
-    );
+    public record SmsDeliveryNotificationSubscriptionDataDto
+    {
+        [JsonPropertyName("subscriptionId")]
+        public string SubscriptionId { get; init; }
+
+        [JsonPropertyName("links")]
+        public LinkDto Links { get; init; }
+    }
 }

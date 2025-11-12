@@ -1,31 +1,82 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.ReversePayment.History.Responses;
+﻿using System.Text.Json.Serialization;
 
-public class ReversePaymentDataDto
+public record ReversePaymentDataDto
 {
-    public string TransactionStatus { get; set; }
-    public string TransferType { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime CommitDate { get; set; }
-    public string FxRate { get; set; }
-    public string ExternalFxRate { get; set; }
-    public string InitiatingUser { get; set; }
-    public string RealUser { get; set; }
-    public string ReviewingUser { get; set; }
-    public string InitiatingAccountHolder { get; set; }
-    public string RealAccountHolder { get; set; }
-    public string ProviderCategory { get; set; }
-    public PartyDto From { get; set; }
-    public PartyDto To { get; set; }
-    public MonetaryDto OriginalAmount { get; set; }
-    public MonetaryDto ExternalAmount { get; set; }
-    public MonetaryDto Amount { get; set; }
-    public MonetaryDto GeneratedAmount { get; set; }
-    public MonetaryDto ConsumedAmount { get; set; }
-    public MonetaryDto NewBalance { get; set; }
-    public List<MonetaryDto> Fees { get; set; } // optional, from/to fees/refunds
-    public string TransactionText { get; set; }
-    public string MainInstructionId { get; set; }
-    public string InstructionId { get; set; }
-    public string ExternalTransactionId { get; set; }
-    public LoyaltyInformationDto LoyaltyInformation { get; set; }
+    [JsonPropertyName("transactionStatus")]
+    public string TransactionStatus { get; init; }
+
+    [JsonPropertyName("transferType")]
+    public string TransferType { get; init; }
+
+    [JsonPropertyName("startDate")]
+    public DateTime StartDate { get; init; }
+
+    [JsonPropertyName("commitDate")]
+    public DateTime CommitDate { get; init; }
+
+    [JsonPropertyName("fxRate")]
+    public string FxRate { get; init; }
+
+    [JsonPropertyName("externalFxRate")]
+    public string ExternalFxRate { get; init; }
+
+    [JsonPropertyName("initiatingUser")]
+    public string InitiatingUser { get; init; }
+
+    [JsonPropertyName("realUser")]
+    public string RealUser { get; init; }
+
+    [JsonPropertyName("reviewingUser")]
+    public string ReviewingUser { get; init; }
+
+    [JsonPropertyName("initiatingAccountHolder")]
+    public string InitiatingAccountHolder { get; init; }
+
+    [JsonPropertyName("realAccountHolder")]
+    public string RealAccountHolder { get; init; }
+
+    [JsonPropertyName("providerCategory")]
+    public string ProviderCategory { get; init; }
+
+    [JsonPropertyName("from")]
+    public PartyDto From { get; init; }
+
+    [JsonPropertyName("to")]
+    public PartyDto To { get; init; }
+
+    [JsonPropertyName("originalAmount")]
+    public MonetaryDto OriginalAmount { get; init; }
+
+    [JsonPropertyName("externalAmount")]
+    public MonetaryDto ExternalAmount { get; init; }
+
+    [JsonPropertyName("amount")]
+    public MonetaryDto Amount { get; init; }
+
+    [JsonPropertyName("generatedAmount")]
+    public MonetaryDto GeneratedAmount { get; init; }
+
+    [JsonPropertyName("consumedAmount")]
+    public MonetaryDto ConsumedAmount { get; init; }
+
+    [JsonPropertyName("newBalance")]
+    public MonetaryDto NewBalance { get; init; }
+
+    [JsonPropertyName("fees")]
+    public List<MonetaryDto> Fees { get; init; }
+
+    [JsonPropertyName("transactionText")]
+    public string TransactionText { get; init; }
+
+    [JsonPropertyName("mainInstructionId")]
+    public string MainInstructionId { get; init; }
+
+    [JsonPropertyName("instructionId")]
+    public string InstructionId { get; init; }
+
+    [JsonPropertyName("externalTransactionId")]
+    public string ExternalTransactionId { get; init; }
+
+    [JsonPropertyName("loyaltyInformation")]
+    public LoyaltyInformationDto LoyaltyInformation { get; init; }
 }

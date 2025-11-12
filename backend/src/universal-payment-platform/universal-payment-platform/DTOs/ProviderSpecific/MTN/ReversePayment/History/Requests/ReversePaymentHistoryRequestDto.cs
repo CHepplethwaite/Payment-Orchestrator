@@ -1,14 +1,37 @@
-﻿public class ReversePaymentHistoryRequestDto
+﻿using System.Text.Json.Serialization;
+
+public record ReversePaymentHistoryRequestDto
 {
-    public string TransactionType { get; set; }
-    public decimal? Amount { get; set; }
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-    public int? Limit { get; set; } = 50;
-    public int? PageNo { get; set; }
-    public string NodeId { get; set; }
-    public string OtherFri { get; set; }
-    public string PosMsisdn { get; set; }
-    public string QuoteId { get; set; }
-    public string TransactionStatus { get; set; }
+    [JsonPropertyName("transactionType")]
+    public string TransactionType { get; init; }
+
+    [JsonPropertyName("amount")]
+    public decimal? Amount { get; init; }
+
+    [JsonPropertyName("startDate")]
+    public DateTime? StartDate { get; init; }
+
+    [JsonPropertyName("endDate")]
+    public DateTime? EndDate { get; init; }
+
+    [JsonPropertyName("limit")]
+    public int? Limit { get; init; } = 50;
+
+    [JsonPropertyName("pageNo")]
+    public int? PageNo { get; init; }
+
+    [JsonPropertyName("nodeId")]
+    public string NodeId { get; init; }
+
+    [JsonPropertyName("otherFri")]
+    public string OtherFri { get; init; }
+
+    [JsonPropertyName("posMsisdn")]
+    public string PosMsisdn { get; init; }
+
+    [JsonPropertyName("quoteId")]
+    public string QuoteId { get; init; }
+
+    [JsonPropertyName("transactionStatus")]
+    public string TransactionStatus { get; init; }
 }

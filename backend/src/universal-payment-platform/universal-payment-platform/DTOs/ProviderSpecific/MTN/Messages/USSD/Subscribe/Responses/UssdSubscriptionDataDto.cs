@@ -1,3 +1,7 @@
-﻿public record UssdSubscriptionDataDto(
-    string SubscriptionId  // Unique ID from MADAPI
-);
+﻿using System.Text.Json.Serialization;
+
+public record UssdSubscriptionDataDto
+{
+    [JsonPropertyName("subscriptionId")]
+    public string SubscriptionId { get; init; }
+}

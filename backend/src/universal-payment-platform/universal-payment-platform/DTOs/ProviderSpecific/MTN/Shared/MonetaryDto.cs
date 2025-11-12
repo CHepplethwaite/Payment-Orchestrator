@@ -1,5 +1,10 @@
-﻿public class MonetaryDto
+﻿using System.Text.Json.Serialization;
+
+public record MonetaryDto
 {
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
+    [JsonPropertyName("amount")]
+    public decimal Amount { get; init; }
+
+    [JsonPropertyName("currency")]
+    public string Currency { get; init; }
 }

@@ -1,3 +1,7 @@
-﻿public record SmsOutboundDataDto(
-    string Status   // Status of the submitted message, e.g., PENDING
-);
+﻿using System.Text.Json.Serialization;
+
+public record SmsOutboundDataDto
+{
+    [JsonPropertyName("status")]
+    public string Status { get; init; }
+}

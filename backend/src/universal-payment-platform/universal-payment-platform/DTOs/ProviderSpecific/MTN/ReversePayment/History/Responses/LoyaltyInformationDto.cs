@@ -1,6 +1,13 @@
-﻿public class LoyaltyInformationDto
+﻿using System.Text.Json.Serialization;
+
+public record LoyaltyInformationDto
 {
-    public MonetaryDto GeneratedAmount { get; set; }
-    public MonetaryDto ConsumedAmount { get; set; }
-    public MonetaryDto NewBalance { get; set; }
+    [JsonPropertyName("generatedAmount")]
+    public MonetaryDto GeneratedAmount { get; init; }
+
+    [JsonPropertyName("consumedAmount")]
+    public MonetaryDto ConsumedAmount { get; init; }
+
+    [JsonPropertyName("newBalance")]
+    public MonetaryDto NewBalance { get; init; }
 }

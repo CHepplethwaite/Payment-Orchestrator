@@ -1,6 +1,17 @@
-﻿public record SmsOutboundRequestDto(
-    string SenderAddress,                  // MSISDN or virtual MSISDN of sender
-    IReadOnlyList<string> ReceiverAddress, // Array of recipient MSISDN(s)
-    string Message,                        // SMS message (max 160 characters)
-    string ClientCorrelator                // Optional unique request identifier
-);
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
+public record SmsOutboundRequestDto
+{
+    [JsonPropertyName("senderAddress")]
+    public string SenderAddress { get; init; }
+
+    [JsonPropertyName("receiverAddress")]
+    public IReadOnlyList<string> ReceiverAddress { get; init; }
+
+    [JsonPropertyName("message")]
+    public string Message { get; init; }
+
+    [JsonPropertyName("clientCorrelator")]
+    public string ClientCorrelator { get; init; }
+}

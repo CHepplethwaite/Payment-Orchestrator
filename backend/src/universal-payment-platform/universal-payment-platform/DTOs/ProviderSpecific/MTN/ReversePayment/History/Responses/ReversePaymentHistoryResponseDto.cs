@@ -1,12 +1,25 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.ReversePayment.History.Responses;
+﻿using System.Text.Json.Serialization;
 
-public class ReversePaymentHistoryResponseDto
+public record ReversePaymentHistoryResponseDto
 {
-    public string StatusCode { get; set; }
-    public string StatusMessage { get; set; }
-    public string TransactionId { get; set; }
-    public string CorrelatorId { get; set; }
-    public string SequenceNo { get; set; }
-    public ReversePaymentDataDto Data { get; set; }
-    public LinksDto Links { get; set; }
+    [JsonPropertyName("statusCode")]
+    public string StatusCode { get; init; }
+
+    [JsonPropertyName("statusMessage")]
+    public string StatusMessage { get; init; }
+
+    [JsonPropertyName("transactionId")]
+    public string TransactionId { get; init; }
+
+    [JsonPropertyName("correlatorId")]
+    public string CorrelatorId { get; init; }
+
+    [JsonPropertyName("sequenceNo")]
+    public string SequenceNo { get; init; }
+
+    [JsonPropertyName("data")]
+    public ReversePaymentDataDto Data { get; init; }
+
+    [JsonPropertyName("links")]
+    public LinksDto Links { get; init; }
 }

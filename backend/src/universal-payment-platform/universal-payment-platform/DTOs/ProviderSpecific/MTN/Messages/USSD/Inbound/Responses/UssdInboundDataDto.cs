@@ -1,7 +1,19 @@
-﻿public record UssdInboundDataDto(
-    string InboundResponse,   // Response value, e.g., null
-    bool UserInputRequired,   // Is user input required
-    int MessageType,          // MessageType for response
-    string ServiceCode,       // Echoed service code
-    string Msisdn             // Recipient msisdn
-);
+﻿using System.Text.Json.Serialization;
+
+public record UssdInboundDataDto
+{
+    [JsonPropertyName("inboundResponse")]
+    public string InboundResponse { get; init; }
+
+    [JsonPropertyName("userInputRequired")]
+    public bool UserInputRequired { get; init; }
+
+    [JsonPropertyName("messageType")]
+    public int MessageType { get; init; }
+
+    [JsonPropertyName("serviceCode")]
+    public string ServiceCode { get; init; }
+
+    [JsonPropertyName("msisdn")]
+    public string Msisdn { get; init; }
+}

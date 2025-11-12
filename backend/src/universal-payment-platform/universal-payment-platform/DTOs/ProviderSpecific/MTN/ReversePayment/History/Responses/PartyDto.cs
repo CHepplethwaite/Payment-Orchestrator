@@ -1,26 +1,64 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.ReversePayment.History.Responses;
+﻿using System.Text.Json.Serialization;
 
-public class PartyDto
+public record PartyDto
 {
-    public string FRI { get; set; }
-    public string Account { get; set; }
-    public string AccountHolder { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string HandlerFirstName { get; set; }
-    public string HandlerLastName { get; set; }
-    public string PosMsisdn { get; set; }
-    public string Note { get; set; }
-    public MonetaryDto Amount { get; set; }
-    public MonetaryDto Fee { get; set; }
-    public MonetaryDto ExternalFee { get; set; }
-    public MonetaryDto Discount { get; set; }
-    public MonetaryDto Promotion { get; set; }
-    public MonetaryDto LoyaltyFee { get; set; }
-    public MonetaryDto LoyaltyReward { get; set; }
-    public MonetaryDto PromotionRefund { get; set; }
-    public MonetaryDto AvailableBalance { get; set; }
-    public MonetaryDto TotalBalance { get; set; }
-    public MonetaryDto CommittedBalance { get; set; }
-    // Add any other monetary fields as needed
+    [JsonPropertyName("fri")]
+    public string FRI { get; init; }
+
+    [JsonPropertyName("account")]
+    public string Account { get; init; }
+
+    [JsonPropertyName("accountHolder")]
+    public string AccountHolder { get; init; }
+
+    [JsonPropertyName("firstName")]
+    public string FirstName { get; init; }
+
+    [JsonPropertyName("lastName")]
+    public string LastName { get; init; }
+
+    [JsonPropertyName("handlerFirstName")]
+    public string HandlerFirstName { get; init; }
+
+    [JsonPropertyName("handlerLastName")]
+    public string HandlerLastName { get; init; }
+
+    [JsonPropertyName("posMsisdn")]
+    public string PosMsisdn { get; init; }
+
+    [JsonPropertyName("note")]
+    public string Note { get; init; }
+
+    [JsonPropertyName("amount")]
+    public MonetaryDto Amount { get; init; }
+
+    [JsonPropertyName("fee")]
+    public MonetaryDto Fee { get; init; }
+
+    [JsonPropertyName("externalFee")]
+    public MonetaryDto ExternalFee { get; init; }
+
+    [JsonPropertyName("discount")]
+    public MonetaryDto Discount { get; init; }
+
+    [JsonPropertyName("promotion")]
+    public MonetaryDto Promotion { get; init; }
+
+    [JsonPropertyName("loyaltyFee")]
+    public MonetaryDto LoyaltyFee { get; init; }
+
+    [JsonPropertyName("loyaltyReward")]
+    public MonetaryDto LoyaltyReward { get; init; }
+
+    [JsonPropertyName("promotionRefund")]
+    public MonetaryDto PromotionRefund { get; init; }
+
+    [JsonPropertyName("availableBalance")]
+    public MonetaryDto AvailableBalance { get; init; }
+
+    [JsonPropertyName("totalBalance")]
+    public MonetaryDto TotalBalance { get; init; }
+
+    [JsonPropertyName("committedBalance")]
+    public MonetaryDto CommittedBalance { get; init; }
 }

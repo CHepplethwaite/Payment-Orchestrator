@@ -1,5 +1,13 @@
-﻿public record UssdSubscriptionRequestDto(
-    string ServiceCode,    // e.g., *1234*356#
-    string CallbackUrl,    // URL to receive MO messages
-    string TargetSystem    // e.g., AYO
-);
+﻿using System.Text.Json.Serialization;
+
+public record UssdSubscriptionRequestDto
+{
+    [JsonPropertyName("serviceCode")]
+    public string ServiceCode { get; init; }
+
+    [JsonPropertyName("callbackUrl")]
+    public string CallbackUrl { get; init; }
+
+    [JsonPropertyName("targetSystem")]
+    public string TargetSystem { get; init; }
+}

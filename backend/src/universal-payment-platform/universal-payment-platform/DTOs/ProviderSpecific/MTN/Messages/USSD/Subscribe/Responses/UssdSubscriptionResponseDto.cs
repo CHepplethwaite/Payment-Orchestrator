@@ -1,9 +1,20 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Messages.USSD.Responses;
+﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Messages.USSD.Responses;
 
-public record UssdSubscriptionResponseDto(
-    string StatusCode,           // e.g., 0000
-    string StatusMessage,        // e.g., Created
-    string TransactionId,        // e.g., xyz-0hij0hjh0-9y6
-    UssdSubscriptionDataDto Data,
-    LinkDto _Links
-);
+public record UssdSubscriptionResponseDto
+{
+    [JsonPropertyName("statusCode")]
+    public string StatusCode { get; init; }
+
+    [JsonPropertyName("statusMessage")]
+    public string StatusMessage { get; init; }
+
+    [JsonPropertyName("transactionId")]
+    public string TransactionId { get; init; }
+
+    [JsonPropertyName("data")]
+    public UssdSubscriptionDataDto Data { get; init; }
+
+    [JsonPropertyName("links")]
+    public LinkDto Links { get; init; }
+}

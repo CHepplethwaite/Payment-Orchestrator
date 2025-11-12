@@ -1,6 +1,10 @@
-﻿namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.SMS.Delivery
+﻿using System.Text.Json.Serialization;
+
+namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.SMS.Delivery
 {
-    public record SmsDeliveryNotificationUnsubscribeDataDto(
-        LinkDto Links  // _link object (self)
-    );
+    public record SmsDeliveryNotificationUnsubscribeDataDto
+    {
+        [JsonPropertyName("links")]
+        public LinkDto Links { get; init; }
+    }
 }

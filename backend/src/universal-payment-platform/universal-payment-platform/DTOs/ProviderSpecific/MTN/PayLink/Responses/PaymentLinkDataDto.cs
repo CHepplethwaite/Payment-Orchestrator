@@ -1,7 +1,13 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.PayLink.Responses;
+﻿using System.Text.Json.Serialization;
 
-public record PaymentLinkDataDto(
-    string ProviderTransactionId,
-    string OrderRedirectUrl,
-    LinkDto Links
-);
+public record PaymentLinkDataDto
+{
+    [JsonPropertyName("providerTransactionId")]
+    public string ProviderTransactionId { get; init; }
+
+    [JsonPropertyName("orderRedirectUrl")]
+    public string OrderRedirectUrl { get; init; }
+
+    [JsonPropertyName("links")]
+    public LinkDto Links { get; init; }
+}
