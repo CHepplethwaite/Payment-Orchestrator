@@ -1,8 +1,7 @@
-﻿public class UssdOutboundResponseDto
-{
-    public string StatusCode { get; set; }      // e.g., 0000
-    public string StatusMessage { get; set; }   // Description of the transaction
-    public string TransactionId { get; set; }   // API transaction id
-    public UssdOutboundDataDto Data { get; set; }
-    public LinkDto _Links { get; set; }         // Reuse generic link DTO
-}
+﻿public record UssdOutboundResponseDto(
+    string StatusCode,            // e.g., 0000
+    string StatusMessage,         // Description of the transaction
+    string TransactionId,         // API transaction id
+    UssdOutboundDataDto Data,
+    LinkDto _Links                // Reuse generic link DTO
+);

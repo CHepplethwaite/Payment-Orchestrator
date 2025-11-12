@@ -1,26 +1,67 @@
-﻿using Application.DTOs.Payments.Responses;
+﻿using System.Text.Json.Serialization;
 
-public class FeeCheckRequestDto
+public record FeeCheckRequestDto
 {
-    public string CorrelatorId { get; set; }
-    public DateTime PaymentDate { get; set; }
-    public string Name { get; set; }
-    public string CallingSystem { get; set; }
-    public string TransactionType { get; set; } // FeeCheck
-    public string TargetSystem { get; set; }
-    public string CallbackUrl { get; set; }
-    public string QuoteId { get; set; }
-    public string Channel { get; set; }
-    public string Description { get; set; }
-    public string AuthorizationCode { get; set; }
-    public string FeeBearer { get; set; } // Payer/Payee
-    public MonetaryDto Amount { get; set; }
-    public MonetaryDto TaxAmount { get; set; }
-    public MonetaryDto TotalAmount { get; set; }
-    public PayerDto Payer { get; set; }
-    public List<PayeeDto> Payees { get; set; }
-    public PaymentMethodDto PaymentMethod { get; set; }
-    public List<AdditionalInformationDto> AdditionalInformation { get; set; }
-    public string Segment { get; set; } // subscriber, agent, merchant, admin
-    public bool IncludePayerCharges { get; set; }
+    [JsonPropertyName("correlatorId")]
+    public string CorrelatorId { get; init; }
+
+    [JsonPropertyName("paymentDate")]
+    public DateTime PaymentDate { get; init; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; init; }
+
+    [JsonPropertyName("callingSystem")]
+    public string CallingSystem { get; init; }
+
+    [JsonPropertyName("transactionType")]
+    public string TransactionType { get; init; }
+
+    [JsonPropertyName("targetSystem")]
+    public string TargetSystem { get; init; }
+
+    [JsonPropertyName("callbackUrl")]
+    public string CallbackUrl { get; init; }
+
+    [JsonPropertyName("quoteId")]
+    public string QuoteId { get; init; }
+
+    [JsonPropertyName("channel")]
+    public string Channel { get; init; }
+
+    [JsonPropertyName("description")]
+    public string Description { get; init; }
+
+    [JsonPropertyName("authorizationCode")]
+    public string AuthorizationCode { get; init; }
+
+    [JsonPropertyName("feeBearer")]
+    public string FeeBearer { get; init; }
+
+    [JsonPropertyName("amount")]
+    public MonetaryDto Amount { get; init; }
+
+    [JsonPropertyName("taxAmount")]
+    public MonetaryDto TaxAmount { get; init; }
+
+    [JsonPropertyName("totalAmount")]
+    public MonetaryDto TotalAmount { get; init; }
+
+    [JsonPropertyName("payer")]
+    public PayerDto Payer { get; init; }
+
+    [JsonPropertyName("payees")]
+    public List<PayeeDto> Payees { get; init; }
+
+    [JsonPropertyName("paymentMethod")]
+    public PaymentMethodDto PaymentMethod { get; init; }
+
+    [JsonPropertyName("additionalInformation")]
+    public List<AdditionalInformationDto> AdditionalInformation { get; init; }
+
+    [JsonPropertyName("segment")]
+    public string Segment { get; init; }
+
+    [JsonPropertyName("includePayerCharges")]
+    public bool IncludePayerCharges { get; init; }
 }

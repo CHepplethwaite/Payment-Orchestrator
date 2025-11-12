@@ -1,9 +1,3 @@
-﻿public class LinkDto
-{
-    public SelfLinkDto Self { get; set; }
-}
+﻿public record SelfLinkDto(string Href);
 
-public class SelfLinkDto
-{
-    public string Href { get; set; }
-}
+public record LinkDto(SelfLinkDto Self);

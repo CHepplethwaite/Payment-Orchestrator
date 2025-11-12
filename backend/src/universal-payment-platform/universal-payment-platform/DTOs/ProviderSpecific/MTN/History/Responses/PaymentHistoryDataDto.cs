@@ -1,26 +1,55 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.History.Responses;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.History.Responses;
 
 namespace Application.DTOs.Payments.Responses
 {
-    public class PaymentHistoryDataDto
+    public record PaymentHistoryDataDto
     {
-        public string Id { get; set; } = string.Empty;
-        public string Href { get; set; } = string.Empty;
-        public string? AuthorizationCode { get; set; }
-        public string CorrelatorId { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public string? Name { get; set; }
-        public DateTime? PaymentDate { get; set; }
-        public string? Status { get; set; }
-        public DateTime? StatusDate { get; set; }
+        [JsonPropertyName("id")]
+        public string Id { get; init; }
 
-        public AccountDto? Account { get; set; }
-        public RelatedPartyDto? RelatedParty { get; set; }
-        public PayerDto? Payer { get; set; }
+        [JsonPropertyName("href")]
+        public string Href { get; init; }
 
-        public List<PaymentItemDto>? PaymentItem { get; set; }
-        public string? CallbackUrl { get; set; }
+        [JsonPropertyName("authorizationCode")]
+        public string? AuthorizationCode { get; init; }
 
-        public List<PaymentRecordDto>? PaymentRecords { get; set; }
+        [JsonPropertyName("correlatorId")]
+        public string CorrelatorId { get; init; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; init; }
+
+        [JsonPropertyName("name")]
+        public string? Name { get; init; }
+
+        [JsonPropertyName("paymentDate")]
+        public DateTime? PaymentDate { get; init; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; init; }
+
+        [JsonPropertyName("statusDate")]
+        public DateTime? StatusDate { get; init; }
+
+        [JsonPropertyName("account")]
+        public AccountDto? Account { get; init; }
+
+        [JsonPropertyName("relatedParty")]
+        public RelatedPartyDto? RelatedParty { get; init; }
+
+        [JsonPropertyName("payer")]
+        public PayerDto? Payer { get; init; }
+
+        [JsonPropertyName("paymentItem")]
+        public List<PaymentItemDto>? PaymentItem { get; init; }
+
+        [JsonPropertyName("callbackUrl")]
+        public string? CallbackUrl { get; init; }
+
+        [JsonPropertyName("paymentRecords")]
+        public List<PaymentRecordDto>? PaymentRecords { get; init; }
     }
 }

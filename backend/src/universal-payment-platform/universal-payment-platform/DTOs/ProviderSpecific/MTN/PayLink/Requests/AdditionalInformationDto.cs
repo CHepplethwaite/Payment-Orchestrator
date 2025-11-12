@@ -1,5 +1,4 @@
-﻿public class AdditionalInformationDto
-{
-    public string Key { get; set; }
-    public string Value { get; set; }
-}
+﻿public record AdditionalInformationDto(
+    string Key,
+    string Value
+);

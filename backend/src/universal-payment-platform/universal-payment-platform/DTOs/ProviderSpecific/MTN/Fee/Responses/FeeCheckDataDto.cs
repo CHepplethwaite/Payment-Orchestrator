@@ -1,9 +1,16 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Fee.Responses;
+﻿using System.Text.Json.Serialization;
 
-public class FeeCheckDataDto
+public record FeeCheckDataDto
 {
-    public string StatusCode { get; set; } // e.g., SUCCESSFUL
-    public string ProviderTransactionId { get; set; }
-    public string StatusMessage { get; set; }
-    public List<FeeDetailDto> FeeDetails { get; set; }
+    [JsonPropertyName("status_code")]
+    public string StatusCode { get; init; }
+
+    [JsonPropertyName("provider_transaction_id")]
+    public string ProviderTransactionId { get; init; }
+
+    [JsonPropertyName("status_message")]
+    public string StatusMessage { get; init; }
+
+    [JsonPropertyName("fee_details")]
+    public IReadOnlyList<FeeDetailDto> FeeDetails { get; init; }
 }

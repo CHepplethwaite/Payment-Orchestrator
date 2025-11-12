@@ -1,7 +1,16 @@
-﻿public class FeeDetailDto
+﻿using System.Text.Json.Serialization;
+
+public record FeeDetailDto
 {
-    public string FeeType { get; set; } // e.g., transfer fee, tax
-    public MonetaryDto Amount { get; set; }
-    public string Description { get; set; }
-    public string Recipient { get; set; } // optional, if fee goes to provider or system
+    [JsonPropertyName("feeType")]
+    public string FeeType { get; init; }
+
+    [JsonPropertyName("amount")]
+    public MonetaryDto Amount { get; init; }
+
+    [JsonPropertyName("description")]
+    public string Description { get; init; }
+
+    [JsonPropertyName("recipient")]
+    public string Recipient { get; init; }
 }

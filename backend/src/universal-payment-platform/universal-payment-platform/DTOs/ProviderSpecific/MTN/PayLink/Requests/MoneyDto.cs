@@ -1,5 +1,1 @@
-﻿public class MoneyDto
-{
-    public decimal Amount { get; set; }
-    public string Units { get; set; }
-}
+﻿public record MoneyDto(decimal Amount, string Units);

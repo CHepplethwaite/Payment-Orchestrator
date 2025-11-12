@@ -1,9 +1,17 @@
 ﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Fee.Responses;
+using System.Text.Json.Serialization;
 
-public class FeeCheckResponseDto
+public record FeeCheckResponseDto
 {
-    public string StatusCode { get; set; } // e.g., 0000
-    public string Error { get; set; }
-    public string SequenceNo { get; set; }
-    public FeeCheckDataDto Data { get; set; }
+    [JsonPropertyName("statusCode")]
+    public string StatusCode { get; init; }
+
+    [JsonPropertyName("error")]
+    public string Error { get; init; }
+
+    [JsonPropertyName("sequenceNo")]
+    public string SequenceNo { get; init; }
+
+    [JsonPropertyName("data")]
+    public FeeCheckDataDto Data { get; init; }
 }

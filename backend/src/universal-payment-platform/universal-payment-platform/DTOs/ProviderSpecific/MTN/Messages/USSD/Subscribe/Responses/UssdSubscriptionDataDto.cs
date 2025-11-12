@@ -1,4 +1,3 @@
-﻿public class UssdSubscriptionDataDto
-{
-    public string SubscriptionId { get; set; }  // Unique ID from MADAPI
-}
+﻿public record UssdSubscriptionDataDto(
+    string SubscriptionId  // Unique ID from MADAPI
+);

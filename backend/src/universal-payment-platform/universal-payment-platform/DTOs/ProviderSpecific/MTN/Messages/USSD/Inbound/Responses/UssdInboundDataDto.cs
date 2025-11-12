@@ -1,8 +1,7 @@
-﻿public class UssdInboundDataDto
-{
-    public string InboundResponse { get; set; }  // Response value, e.g., null
-    public bool UserInputRequired { get; set; }  // Is user input required
-    public int MessageType { get; set; }         // MessageType for response
-    public string ServiceCode { get; set; }      // Echoed service code
-    public string Msisdn { get; set; }           // Recipient msisdn
-}
+﻿public record UssdInboundDataDto(
+    string InboundResponse,   // Response value, e.g., null
+    bool UserInputRequired,   // Is user input required
+    int MessageType,          // MessageType for response
+    string ServiceCode,       // Echoed service code
+    string Msisdn             // Recipient msisdn
+);

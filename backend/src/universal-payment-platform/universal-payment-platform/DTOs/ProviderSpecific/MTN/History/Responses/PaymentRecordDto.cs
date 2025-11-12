@@ -1,11 +1,22 @@
-﻿namespace Application.DTOs.Payments.Responses
+﻿using System.Text.Json.Serialization;
+
+namespace Application.DTOs.Payments.Responses
 {
-    public class PaymentRecordDto
+    public record PaymentRecordDto
     {
-        public string? RecordId { get; set; }
-        public string? Description { get; set; }
-        public DateTime? RecordDate { get; set; }
-        public MoneyDto? Amount { get; set; }
-        public string? Status { get; set; }
+        [JsonPropertyName("recordId")]
+        public string? RecordId { get; init; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; init; }
+
+        [JsonPropertyName("recordDate")]
+        public DateTime? RecordDate { get; init; }
+
+        [JsonPropertyName("amount")]
+        public MoneyDto? Amount { get; init; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; init; }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Messages.USSD.Responses;
 
-public class UssdSubscriptionResponseDto
-{
-    public string StatusCode { get; set; }      // e.g., 0000
-    public string StatusMessage { get; set; }   // e.g., Created
-    public string TransactionId { get; set; }   // e.g., xyz-0hij0hjh0-9y6
-    public UssdSubscriptionDataDto Data { get; set; }
-    public LinkDto _Links { get; set; }
-}
+public record UssdSubscriptionResponseDto(
+    string StatusCode,           // e.g., 0000
+    string StatusMessage,        // e.g., Created
+    string TransactionId,        // e.g., xyz-0hij0hjh0-9y6
+    UssdSubscriptionDataDto Data,
+    LinkDto _Links
+);

@@ -1,8 +1,9 @@
-﻿public class UssdUnsubscribeResponseDto
-{
-    public string StatusCode { get; set; }      // e.g., 0000
-    public string StatusMessage { get; set; }   // e.g., Created / OK
-    public string TransactionId { get; set; }   // e.g., xyz-0hij0hjh0-9y6
-    public UssdSubscriptionDataDto Data { get; set; } // same as subscription
-    public LinkDto _Links { get; set; }        // same as subscription
-}
+﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Messages.USSD.Responses;
+
+public record UssdUnsubscribeResponseDto(
+    string StatusCode,            // e.g., 0000
+    string StatusMessage,         // e.g., Created / OK
+    string TransactionId,         // e.g., xyz-0hij0hjh0-9y6
+    UssdSubscriptionDataDto Data, // same as subscription
+    LinkDto _Links                // same as subscription
+);

@@ -1,8 +1,13 @@
-﻿namespace Application.DTOs.Payments.Responses
+﻿using System.Text.Json.Serialization;
+
+namespace Application.DTOs.Payments.Responses
 {
-    public class MoneyDto
+    public record MoneyDto
     {
-        public decimal Amount { get; set; }
-        public string Units { get; set; } = string.Empty;
+        [JsonPropertyName("amount")]
+        public decimal Amount { get; init; }
+
+        [JsonPropertyName("units")]
+        public string Units { get; init; } = "";
     }
 }

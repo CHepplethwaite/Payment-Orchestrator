@@ -1,14 +1,25 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.History.Responses;
+﻿using System.Text.Json.Serialization;
 
 namespace Application.DTOs.Payments.Responses
 {
-    public class PaymentHistoryResponseDto
+    public record PaymentHistoryResponseDto
     {
-        public string StatusCode { get; set; } = string.Empty;
-        public string StatusMessage { get; set; } = string.Empty;
-        public string TransactionId { get; set; } = string.Empty;
-        public string CustomerId { get; set; } = string.Empty;
-        public string SequenceNo { get; set; } = string.Empty;
-        public PaymentHistoryDataDto? Data { get; set; }
+        [JsonPropertyName("statusCode")]
+        public string StatusCode { get; init; }
+
+        [JsonPropertyName("statusMessage")]
+        public string StatusMessage { get; init; }
+
+        [JsonPropertyName("transactionId")]
+        public string TransactionId { get; init; }
+
+        [JsonPropertyName("customerId")]
+        public string CustomerId { get; init; }
+
+        [JsonPropertyName("sequenceNo")]
+        public string SequenceNo { get; init; }
+
+        [JsonPropertyName("data")]
+        public PaymentHistoryDataDto? Data { get; init; }
     }
 }

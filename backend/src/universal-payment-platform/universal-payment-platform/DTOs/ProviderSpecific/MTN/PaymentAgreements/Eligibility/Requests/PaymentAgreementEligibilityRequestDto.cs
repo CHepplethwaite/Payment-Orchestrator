@@ -1,4 +1,1 @@
-﻿public class PaymentAgreementEligibilityRequestDto
-{
-    public string BillingAccountNumber { get; set; }
-}
+﻿public record PaymentAgreementEligibilityRequestDto(string BillingAccountNumber);
