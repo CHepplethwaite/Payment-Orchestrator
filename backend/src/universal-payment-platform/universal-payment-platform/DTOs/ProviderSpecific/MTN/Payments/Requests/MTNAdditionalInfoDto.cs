@@ -10,7 +10,5 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         [JsonPropertyName("description")]
         public required string Description { get; init; }
 
-        [JsonPropertyName("segment")]
-        public string? Segment { get; init; }
     }
 }

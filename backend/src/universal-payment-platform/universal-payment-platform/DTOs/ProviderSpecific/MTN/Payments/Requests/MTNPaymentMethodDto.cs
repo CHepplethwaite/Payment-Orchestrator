@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Enums;
+using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests.PaymentMethodDetails;
 
 namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
 {
@@ -11,21 +13,15 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         public string? Description { get; init; }
 
         [JsonPropertyName("validFrom")]
-        public string? ValidFrom { get; init; }
+        public DateTime? ValidFrom { get; init; }
 
         [JsonPropertyName("validTo")]
-        public string? ValidTo { get; init; }
+        public DateTime? ValidTo { get; init; }
 
         [JsonPropertyName("type")]
-        public required string Type { get; init; }
+        public required PaymentMethodType Type { get; init; }
 
         [JsonPropertyName("details")]
-        public object? Details { get; init; }
-
-        [JsonPropertyName("status")]
-        public string? Status { get; init; }
-
-        [JsonPropertyName("statusDate")]
-        public string? StatusDate { get; init; }
+        public PaymentMethodDetailsDto? Details { get; init; }
     }
 }

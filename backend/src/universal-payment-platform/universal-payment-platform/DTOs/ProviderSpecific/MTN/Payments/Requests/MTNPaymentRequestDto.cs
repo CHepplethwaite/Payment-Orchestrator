@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Requests;
+﻿using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Enums;
+using System.Text.Json.Serialization;
 
 namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
 {
@@ -9,19 +9,19 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         public required string CorrelatorId { get; init; }
 
         [JsonPropertyName("paymentDate")]
-        public string? PaymentDate { get; init; }
+        public DateTime? PaymentDate { get; init; }
 
         [JsonPropertyName("name")]
         public string? Name { get; init; }
 
         [JsonPropertyName("callingSystem")]
-        public string? CallingSystem { get; init; }
+        public CallingSystem? CallingSystem { get; init; }
 
         [JsonPropertyName("transactionType")]
-        public required string TransactionType { get; init; }
+        public required TransactionType TransactionType { get; init; }
 
         [JsonPropertyName("targetSystem")]
-        public string? TargetSystem { get; init; }
+        public TargetSystem? TargetSystem { get; init; }
 
         [JsonPropertyName("callbackURL")]
         public required string CallbackURL { get; init; }
@@ -39,7 +39,7 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         public string? AuthorizationCode { get; init; }
 
         [JsonPropertyName("feeBearer")]
-        public string? FeeBearer { get; init; }
+        public FeeBearer? FeeBearer { get; init; }
 
         [JsonPropertyName("amount")]
         public required MTNMonetaryAmountDto Amount { get; init; }
@@ -54,12 +54,15 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         public required MTNPayerDto Payer { get; init; }
 
         [JsonPropertyName("payee")]
-        public required List<MTNPayeeDto> Payee { get; init; }
+        public required List<MTNPayeeDto> Payees { get; init; }
 
         [JsonPropertyName("paymentMethod")]
         public required MTNPaymentMethodDto PaymentMethod { get; init; }
 
         [JsonPropertyName("additionalInformation")]
         public List<MTNAdditionalInfoDto>? AdditionalInformation { get; init; }
+
+        [JsonPropertyName("segment")]
+        public Segment? Segment { get; init; }
     }
 }
