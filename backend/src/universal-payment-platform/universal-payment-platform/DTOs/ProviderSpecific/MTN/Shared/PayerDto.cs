@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared
 {
-    public record MTNPayerDto
+    public record PayerDto
     {
         [JsonPropertyName("payerIdType")]
         public string? PayerIdType { get; init; }

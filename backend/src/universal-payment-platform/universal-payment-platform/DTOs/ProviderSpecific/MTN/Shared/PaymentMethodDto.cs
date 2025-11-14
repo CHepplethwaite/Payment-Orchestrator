@@ -2,9 +2,9 @@
 using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Enums;
 using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests.PaymentMethodDetails;
 
-namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared
 {
-    public record MTNPaymentMethodDto
+    public record PaymentMethodDto
     {
         [JsonPropertyName("name")]
         public string? Name { get; init; }

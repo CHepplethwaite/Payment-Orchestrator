@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.TransactionStatus.Responses;
 
 namespace TransactionStatus.Responses
 {
@@ -26,12 +27,12 @@ namespace TransactionStatus.Responses
         public PaymentTransactionStatusDataDto? Data { get; init; }
 
         [JsonPropertyName("additionalInformation")]
-        public PaymentTransactionStatusAdditionalInformationDto AdditionalInformation { get; init; }
+        public PaymentTransactionStatusAdditionalInformationDto? AdditionalInformation { get; init; }
 
         [JsonPropertyName("details")]
-        public PaymentTransactionStatusDetailsDto Details { get; init; }
+        public PaymentTransactionStatusDetailsDto? Details { get; init; }
 
         [JsonPropertyName("_links")]
-        public PaymentTransactionStatusLinksDto Links { get; init; }
+        public PaymentTransactionStatusLinksDto? Links { get; init; }
     }
 }

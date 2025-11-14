@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.TransactionStatus.Responses
+namespace TransactionStatus.Responses
 {
     public record PaymentTransactionStatusSelfDto
     {

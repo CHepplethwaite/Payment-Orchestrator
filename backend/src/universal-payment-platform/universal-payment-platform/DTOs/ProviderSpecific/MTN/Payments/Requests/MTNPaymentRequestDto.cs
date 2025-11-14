@@ -1,5 +1,7 @@
 ﻿using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Enums;
 using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared.Enums;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
 namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
 {
@@ -42,22 +44,22 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         public FeeBearer? FeeBearer { get; init; }
 
         [JsonPropertyName("amount")]
-        public required MTNMonetaryAmountDto Amount { get; init; }
+        public required MonetaryAmountDto Amount { get; init; }
 
         [JsonPropertyName("taxAmount")]
-        public MTNMonetaryAmountDto? TaxAmount { get; init; }
+        public MonetaryAmountDto? TaxAmount { get; init; }
 
         [JsonPropertyName("totalAmount")]
-        public required MTNMonetaryAmountDto TotalAmount { get; init; }
+        public required MonetaryAmountDto TotalAmount { get; init; }
 
         [JsonPropertyName("payer")]
-        public required MTNPayerDto Payer { get; init; }
+        public required PayerDto Payer { get; init; }
 
         [JsonPropertyName("payee")]
-        public required List<MTNPayeeDto> Payees { get; init; }
+        public required List<PayeeDto> Payees { get; init; }
 
         [JsonPropertyName("paymentMethod")]
-        public required MTNPaymentMethodDto PaymentMethod { get; init; }
+        public required PaymentMethodDto PaymentMethod { get; init; }
 
         [JsonPropertyName("additionalInformation")]
         public List<MTNAdditionalInfoDto>? AdditionalInformation { get; init; }

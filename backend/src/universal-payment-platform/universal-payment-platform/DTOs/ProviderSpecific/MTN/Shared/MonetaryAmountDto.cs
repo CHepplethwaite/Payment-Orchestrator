@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared
 {
-    public record MTNMonetaryAmountDto
+    public record MonetaryAmountDto
     {
         [JsonPropertyName("amount")]
         public required decimal Amount { get; init; }

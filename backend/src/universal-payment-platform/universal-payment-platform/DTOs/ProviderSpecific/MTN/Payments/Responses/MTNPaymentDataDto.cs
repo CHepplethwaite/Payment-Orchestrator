@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Responses;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 using UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests;
 
 namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Responses
@@ -10,13 +11,13 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Responses
         public string? ApprovalId { get; init; }
 
         [JsonPropertyName("transactionFee")]
-        public MTNMonetaryAmountDto? TransactionFee { get; init; }
+        public MonetaryAmountDto? TransactionFee { get; init; }
 
         [JsonPropertyName("discount")]
-        public MTNMonetaryAmountDto? Discount { get; init; }
+        public MonetaryAmountDto? Discount { get; init; }
 
         [JsonPropertyName("newBalance")]
-        public MTNMonetaryAmountDto? NewBalance { get; init; }
+        public MonetaryAmountDto? NewBalance { get; init; }
 
         [JsonPropertyName("payerNote")]
         public string? PayerNote { get; init; }

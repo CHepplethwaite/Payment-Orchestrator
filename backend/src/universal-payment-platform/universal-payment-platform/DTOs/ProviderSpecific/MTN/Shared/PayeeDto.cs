@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared
 {
-    public record MTNPayeeDto
+    public record PayeeDto
     {
         [JsonPropertyName("amount")]
-        public MTNMonetaryAmountDto? Amount { get; init; }
+        public MonetaryAmountDto? Amount { get; init; }
 
         [JsonPropertyName("taxAmount")]
-        public MTNMonetaryAmountDto? TaxAmount { get; init; }
+        public MonetaryAmountDto? TaxAmount { get; init; }
 
         [JsonPropertyName("totalAmount")]
-        public required MTNMonetaryAmountDto TotalAmount { get; init; }
+        public required MonetaryAmountDto TotalAmount { get; init; }
 
         [JsonPropertyName("payeeIdType")]
         public string? PayeeIdType { get; init; }
