@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN
+namespace TransactionStatus.Responses
 {
-    public record MTNTransactionStatusCustomerDto
+    public record PaymentTransactionStatusDetailsDto
     {
         [JsonPropertyName("brand")]
         public string? Brand { get; init; }

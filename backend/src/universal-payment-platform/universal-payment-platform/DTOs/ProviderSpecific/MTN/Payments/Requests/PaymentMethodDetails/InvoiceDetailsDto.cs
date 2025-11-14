@@ -34,6 +34,6 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests.P
         public string? RetryRun { get; init; }
 
         [JsonPropertyName("retryFrequency")]
-        public string? RetryFrequency { get; init; }
+        public RetryFrequencyType? RetryFrequency { get; init; }
     }
 }

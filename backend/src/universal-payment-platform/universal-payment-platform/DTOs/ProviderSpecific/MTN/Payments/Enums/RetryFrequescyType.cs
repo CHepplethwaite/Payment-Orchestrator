@@ -1,6 +1,12 @@
-﻿namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Enums
+﻿using System.Text.Json.Serialization;
+
+namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Enums
 {
-    public class RetryFrequescyType
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum RetryFrequencyType
     {
+        once,
+        hourly,
+        daily,
     }
 }
