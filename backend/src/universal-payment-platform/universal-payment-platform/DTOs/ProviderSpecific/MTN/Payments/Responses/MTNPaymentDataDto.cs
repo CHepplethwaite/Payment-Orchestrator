@@ -11,13 +11,13 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Responses
         public string? ApprovalId { get; init; }
 
         [JsonPropertyName("transactionFee")]
-        public MonetaryAmountDto? TransactionFee { get; init; }
+        public MonetaryTypeDto? TransactionFee { get; init; }
 
         [JsonPropertyName("discount")]
-        public MonetaryAmountDto? Discount { get; init; }
+        public MonetaryTypeDto? Discount { get; init; }
 
         [JsonPropertyName("newBalance")]
-        public MonetaryAmountDto? NewBalance { get; init; }
+        public MonetaryTypeDto? NewBalance { get; init; }
 
         [JsonPropertyName("payerNote")]
         public string? PayerNote { get; init; }

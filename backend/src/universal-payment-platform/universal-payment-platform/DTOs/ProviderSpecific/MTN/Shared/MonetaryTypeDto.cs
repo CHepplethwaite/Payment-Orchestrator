@@ -2,7 +2,7 @@
 
 namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared
 {
-    public record MonetaryAmountDto
+    public record MonetaryTypeDto
     {
         [JsonPropertyName("amount")]
         public required decimal Amount { get; init; }

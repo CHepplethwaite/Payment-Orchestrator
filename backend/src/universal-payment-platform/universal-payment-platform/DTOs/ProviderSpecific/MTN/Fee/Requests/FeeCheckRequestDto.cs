@@ -43,13 +43,13 @@ namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.FeeCheck
         public FeeBearer FeeBearer { get; init; }
 
         [JsonPropertyName("amount")]
-        public MonetaryAmountDto? Amount { get; init; }
+        public MonetaryTypeDto? Amount { get; init; }
 
         [JsonPropertyName("taxAmount")]
-        public MonetaryAmountDto? TaxAmount { get; init; }
+        public MonetaryTypeDto? TaxAmount { get; init; }
 
         [JsonPropertyName("totalAmount")]
-        public required MonetaryAmountDto TotalAmount { get; init; }
+        public required MonetaryTypeDto TotalAmount { get; init; }
 
         [JsonPropertyName("payer")]
         public PayerDto? Payer { get; init; }

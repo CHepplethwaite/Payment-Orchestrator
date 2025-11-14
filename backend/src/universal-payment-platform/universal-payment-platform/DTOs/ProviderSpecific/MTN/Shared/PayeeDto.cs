@@ -6,13 +6,13 @@ namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared
     public record PayeeDto
     {
         [JsonPropertyName("amount")]
-        public MonetaryAmountDto? Amount { get; init; }
+        public MonetaryTypeDto? Amount { get; init; }
 
         [JsonPropertyName("taxAmount")]
-        public MonetaryAmountDto? TaxAmount { get; init; }
+        public MonetaryTypeDto? TaxAmount { get; init; }
 
         [JsonPropertyName("totalAmount")]
-        public required MonetaryAmountDto TotalAmount { get; init; }
+        public required MonetaryTypeDto TotalAmount { get; init; }
 
         [JsonPropertyName("payeeIdType")]
         public string? PayeeIdType { get; init; }

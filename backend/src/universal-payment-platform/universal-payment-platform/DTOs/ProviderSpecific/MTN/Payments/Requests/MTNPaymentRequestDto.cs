@@ -44,13 +44,13 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests
         public FeeBearer? FeeBearer { get; init; }
 
         [JsonPropertyName("amount")]
-        public required MonetaryAmountDto Amount { get; init; }
+        public required MonetaryTypeDto Amount { get; init; }
 
         [JsonPropertyName("taxAmount")]
-        public MonetaryAmountDto? TaxAmount { get; init; }
+        public MonetaryTypeDto? TaxAmount { get; init; }
 
         [JsonPropertyName("totalAmount")]
-        public required MonetaryAmountDto TotalAmount { get; init; }
+        public required MonetaryTypeDto TotalAmount { get; init; }
 
         [JsonPropertyName("payer")]
         public required PayerDto Payer { get; init; }

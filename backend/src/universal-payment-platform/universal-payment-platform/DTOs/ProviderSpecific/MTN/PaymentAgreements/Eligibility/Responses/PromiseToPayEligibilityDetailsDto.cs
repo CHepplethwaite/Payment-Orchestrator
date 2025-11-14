@@ -2,12 +2,15 @@
 
 public record PromiseToPayEligibilityDetailsDto
 {
-    [JsonPropertyName("isEligible")]
-    public bool IsEligible { get; init; }
+    [JsonPropertyName("eligibilityStatus")]
+    public string? EligiblityStatus { get; init; }
 
-    [JsonPropertyName("reason")]
-    public string? Reason { get; init; }
+    [JsonPropertyName("accountBalance")]
+    public string? AccountBalance { get; init; }
 
-    [JsonPropertyName("validUntil")]
-    public DateTime? ValidUntil { get; init; }
+    [JsonPropertyName("minimumAmount")]
+    public DateTime? MinimumAmount { get; init; }
+
+    [JsonPropertyName("paymentStartDate")]
+    public DateTime? PaymentStartDate { get; init; }
 }
