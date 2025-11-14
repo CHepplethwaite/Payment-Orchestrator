@@ -1,17 +1,18 @@
 ﻿using System.Text.Json.Serialization;
-using universal_payment_platform.DTOs.ProviderSpecific.MTN.PaymentAgreements.Eligibility.Responses;
 
-public record PaymentAgreementEligibilityResponseDto
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.PaymentAgreements.Eligibility.Responses
 {
-    [JsonPropertyName("statusCode")]
-    public string StatusCode { get; init; }
+    public record PromiseToPayEligibilityResponseDto
+    {
+        [JsonPropertyName("statusCode")]
+        public required string StatusCode { get; init; }  // MADAPI Canonical Error Code
 
-    [JsonPropertyName("statusMessage")]
-    public string StatusMessage { get; init; }
+        [JsonPropertyName("statusMessage")]
+        public required string StatusMessage { get; init; }  // Transaction message
 
-    [JsonPropertyName("transactionId")]
-    public string TransactionId { get; init; }
+        [JsonPropertyName("transactionId")]
+        public required string TransactionId { get; init; }  // Unique transaction ID
 
-    [JsonPropertyName("data")]
-    public PaymentAgreementEligibilityDataDto Data { get; init; }
-}
+        [JsonPropertyName("data")]
+        public PromiseToPayEligibilityDataDto? Data { get; init; }  // Eligibility details
+    }
