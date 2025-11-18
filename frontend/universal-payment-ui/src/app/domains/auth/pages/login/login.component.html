@@ -1,0 +1,33 @@
+<div class="login-container">
+  <h2>Login</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div>
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        [value]="email"
+        (input)="email = $any($event.target).value"
+        name="email"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        [value]="password"
+        (input)="password = $any($event.target).value"
+        name="password"
+        required
+      />
+    </div>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <div [hidden]="!errorMessage" class="error">{{ errorMessage }}</div>
+</div>
