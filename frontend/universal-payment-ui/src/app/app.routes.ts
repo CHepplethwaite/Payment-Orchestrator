@@ -1,97 +1,39 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/authentication/auth.guard';
-import { LoginComponent } from './domains/auth/pages/login/login.component';
-import { DashboardComponent } from './domains/dashboard/dashboard.component';
+import { LoginComponent } from './auth/pages/login/login.component';
+import { RegisterComponent } from './auth/pages/register/register.component';
+import { ForgotPasswordComponent } from './auth/pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './auth/pages/reset-password/reset-password.component';
+import { VerifyEmailComponent } from './auth/pages/verify-email/verify-email.component';
+import { LogoutComponent } from './auth/pages/logout/logout.component';
+import { ResendVerificationComponent } from './auth/pages/resend-verification/resend-verification.component';
+import { LockAccountComponent } from './auth/pages/lock-account/lock-account.component';
+import { TwoFactorAuthComponent } from './auth/pages/two-factor-auth/two-factor-auth.component';
+import { OAuthCallbackComponent } from './auth/pages/oauth-callback/oauth-callback.component';
+
+import { AuthGuard } from './auth/guards/auth.guard';      // protects routes for logged-in users
+import { GuestGuard } from './auth/guards/guest.guard';    // protects routes for guests only
 
 export const routes: Routes = [
-  // Public routes
   {
     path: 'auth',
     children: [
-      { path: 'login', component: LoginComponent },
+      { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
+      { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
+      { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
+      { path: 'reset-password/:token', component: ResetPasswordComponent, canActivate: [GuestGuard] },
+      { path: 'verify-email/:token', component: VerifyEmailComponent, canActivate: [GuestGuard] },
+      { path: 'resend-verification', component: ResendVerificationComponent, canActivate: [GuestGuard] },
+      { path: 'lock', component: LockAccountComponent },
+      { path: '2fa', component: TwoFactorAuthComponent, canActivate: [AuthGuard] },
+      { path: 'oauth/callback', component: OAuthCallbackComponent, canActivate: [GuestGuard] },
+      { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },
 
-  // Protected routes (lazy-loaded feature modules)
-  {
-    path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [AuthGuard]
-  },
+  // Optional: default redirect to login
+  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
 
-  {
-    path: 'payments',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/payments/payments.module').then(m => m.PaymentsModule)
-  },
-
-  {
-    path: 'kyc',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/kyc/kyc.module').then(m => m.KycModule)
-  },
-
-  {
-    path: 'admin',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/admin/admin.module').then(m => m.AdminModule)
-  },
-
-  {
-    path: 'agents',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/agents/agents.module').then(m => m.AgentsModule)
-  },
-
-  {
-    path: 'merchants',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/merchants/merchants.module').then(m => m.MerchantsModule)
-  },
-
-  {
-    path: 'reports',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/reports/reports.module').then(m => m.ReportsModule)
-  },
-
-  {
-    path: 'webhooks',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/webhooks/webhooks.module').then(m => m.WebhooksModule)
-  },
-
-  // Provider-specific routes
-  {
-    path: 'providers/airtel',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/providers/airtel/airtel.module').then(m => m.AirtelModule)
-  },
-
-  {
-    path: 'providers/mtn',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/providers/mtn/mtn.module').then(m => m.MtnModule)
-  },
-
-  {
-    path: 'providers/zamtel',
-    canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./domains/providers/zamtel/zamtel.module').then(m => m.ZamtelModule)
-  },
-
-  // Default redirects
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'dashboard' }
+  // Wildcard route for unknown paths
+  { path: '**', redirectTo: 'auth/login' }
 ];
