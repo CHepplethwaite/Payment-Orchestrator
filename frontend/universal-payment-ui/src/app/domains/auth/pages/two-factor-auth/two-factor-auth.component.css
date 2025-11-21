@@ -1,0 +1,249 @@
+.two-factor-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: #f5f5f5;
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 8px;
+
+    &-header {
+      text-align: center;
+      background: white;
+      border-bottom: 1px solid #eee;
+      padding: 2rem;
+
+      .security-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      h2 {
+        margin: 0 0 0.5rem 0;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .subtitle {
+        color: #666;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+
+    &-body {
+      padding: 2rem;
+
+      .code-inputs {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        gap: 0.5rem;
+
+        .code-input-wrapper {
+          flex: 1;
+
+          .code-input {
+            width: 100%;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+
+            &:focus {
+              border-color: #007bff;
+              box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+              outline: none;
+            }
+
+            &.is-invalid {
+              border-color: #dc3545;
+            }
+          }
+        }
+      }
+
+      .form-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .remember-device {
+        margin-bottom: 1.5rem;
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          font-size: 0.9rem;
+          color: #555;
+
+          input {
+            margin-right: 0.5rem;
+          }
+
+          .checkmark {
+            margin-right: 0.5rem;
+          }
+        }
+      }
+
+      .btn {
+        padding: 0.75rem;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &-primary {
+          background: #007bff;
+          border: none;
+
+          &:hover:not(:disabled) {
+            background: #0056b3;
+          }
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .additional-options {
+        margin: 2rem 0 1.5rem 0;
+        display: grid;
+        gap: 1rem;
+
+        .option-card {
+          background: #f8f9fa;
+          border: 1px solid #e9ecef;
+          border-radius: 6px;
+          padding: 1.25rem;
+
+          h4 {
+            margin: 0 0 0.75rem 0;
+            color: #333;
+            font-size: 1rem;
+            text-align: center;
+          }
+
+          .option-buttons {
+            display: grid;
+            gap: 0.5rem;
+          }
+
+          .btn {
+            font-size: 0.85rem;
+            padding: 0.5rem;
+          }
+        }
+      }
+
+      .security-tips {
+        background: #e8f4fd;
+        border: 1px solid #b8daff;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+
+        h5 {
+          margin: 0 0 0.5rem 0;
+          color: #004085;
+          font-size: 0.9rem;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: 1rem;
+          font-size: 0.8rem;
+          color: #004085;
+
+          li {
+            margin-bottom: 0.25rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Custom checkbox styling
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+
+    &:checked ~ .checkmark:after {
+      display: block;
+    }
+  }
+
+  .checkmark {
+    position: relative;
+    height: 18px;
+    width: 18px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+
+    &:after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+      border: solid #007bff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+
+  &:hover input ~ .checkmark {
+    border-color: #007bff;
+  }
+}
+
+// Responsive design
+@media (max-width: 576px) {
+  .two-factor-container {
+    padding: 10px;
+
+    .card {
+      &-header,
+      &-body {
+        padding: 1.5rem;
+      }
+
+      .code-inputs {
+        .code-input-wrapper {
+          .code-input {
+            height: 50px;
+            font-size: 1.25rem;
+          }
+        }
+      }
+    }
+  }
+}

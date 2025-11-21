@@ -1,0 +1,86 @@
+<div class="two-factor-container">
+  <div class="card">
+    <div class="card-header">
+      <div class="security-icon">🔐</div>
+      <h2>Two-Factor Authentication</h2>
+      <p class="subtitle">
+        Enter the 6-digit verification code from your {{ getAuthMethodDisplay() }}
+      </p>
+    </div>
+
+    <div class="card-body">
+      <form [formGroup]="twoFactorForm" (ngSubmit)="onSubmit()">
+        <div class="code-inputs">
+          <div *ngFor="let field of codeArray; let i = index" class="code-input-wrapper">
+            <input
+              #codeInput
+              type="text"
+              maxlength="1"
+              [formControlName]="field"
+              [class.is-invalid]="f[field].invalid && (f[field].touched || f[field].dirty)"
+              (input)="onInputChange($event, i)"
+              (keydown)="onKeyDown($event, i)"
+              class="code-input"
+              pattern="[0-9]"
+              inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="form-error" *ngIf="codeArray.some(key => f[key].invalid && f[key].touched)">
+          Please enter a valid 6-digit code
+        </div>
+
+        <div class="form-group remember-device">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="rememberDevice">
+            <span class="checkmark"></span>
+            Remember this device for 30 days
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          [disabled]="loading || !isFormComplete()">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
+          {{ loading ? 'Verifying...' : 'Verify' }}
+        </button>
+      </form>
+
+      <div class="additional-options">
+        <div class="option-card">
+          <h4>Didn't receive the code?</h4>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-block"
+            (click)="resendCode()"
+            [disabled]="resending || countdown > 0">
+            <span *ngIf="resending" class="spinner-border spinner-border-sm mr-2"></span>
+            {{ countdown > 0 ? ('Resend in ' + countdown + 's') : (resending ? 'Sending...' : 'Resend Code') }}
+          </button>
+        </div>
+
+        <div class="option-card">
+          <h4>Other Options</h4>
+          <div class="option-buttons">
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="useBackupCode()">
+              Use Backup Code
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="tryAnotherMethod()">
+              Try Another Method
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="security-tips">
+        <h5>Security Tips:</h5>
+        <ul>
+          <li>Never share your verification codes with anyone</li>
+          <li>Codes expire after 5 minutes for security</li>
+          <li>Use backup codes if you lose access to your device</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

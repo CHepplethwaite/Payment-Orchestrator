@@ -8,10 +8,10 @@ import { LogoutComponent } from './domains/auth/pages/logout/logout.component';
 import { ResendVerificationComponent } from './domains/auth/pages/resend-verification/resend-verification.component';
 import { LockAccountComponent } from './domains/auth/pages/lock-account/lock-account.component';
 import { TwoFactorAuthComponent } from './domains/auth/pages/two-factor-auth/two-factor-auth.component';
-import { OAuthCallbackComponent } from './domains/auth/pages/oauth-callback/oauth-callback.component';
+import { OauthCallbackComponent } from './domains/auth/pages/oauth-callback/oauth-callback.component';
 
-import { AuthGuard } from './auth/guards/auth.guard';      // protects routes for logged-in users
-import { GuestGuard } from './auth/guards/guest.guard';    // protects routes for guests only
+import { AuthGuard } from './core/guards/auth.guard';      // protects routes for logged-in users
+import { GuestGuard } from './core/guards/guest.guard';    // protects routes for guests only
 
 export const routes: Routes = [
   {
@@ -25,7 +25,7 @@ export const routes: Routes = [
       { path: 'resend-verification', component: ResendVerificationComponent, canActivate: [GuestGuard] },
       { path: 'lock', component: LockAccountComponent },
       { path: '2fa', component: TwoFactorAuthComponent, canActivate: [AuthGuard] },
-      { path: 'oauth/callback', component: OAuthCallbackComponent, canActivate: [GuestGuard] },
+      { path: 'oauth/callback', component: OauthCallbackComponent, canActivate: [GuestGuard] },
       { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]

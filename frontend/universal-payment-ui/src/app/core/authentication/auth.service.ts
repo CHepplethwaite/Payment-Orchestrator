@@ -1,7 +1,9 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 export interface User {
@@ -30,12 +32,27 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
+  requiresTwoFactor?: boolean;
 }
 
 export interface TokenRefreshResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
+}
+
+export interface TwoFactorResponse {
+  success: boolean;
+  requiresTwoFactor?: boolean;
+  recoveryCodes?: string[];
+}
+
+export interface OAuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  isNewUser?: boolean;
 }
 
 @Injectable({
@@ -49,9 +66,11 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly USER_KEY = 'current_user';
   private readonly REMEMBER_ME_KEY = 'remember_me';
+  private readonly API_URL = '/api/auth';
 
   constructor(
     private router: Router,
+    private http: HttpClient,
     private jwtHelper: JwtHelperService,
     @Inject(PLATFORM_ID) private platformId: any
   ) {
@@ -59,6 +78,11 @@ export class AuthService {
       this.getStoredUser()
     );
     this.currentUser = this.currentUserSubject.asObservable();
+    
+    // Auto-refresh token on service initialization
+    if (this.isAuthenticated()) {
+      this.scheduleTokenRefresh(this.getTokenExpiration());
+    }
   }
 
   public get currentUserValue(): User | null {
@@ -73,44 +97,222 @@ export class AuthService {
     return this.getStoredRefreshToken();
   }
 
+  // Main login method
   login(credentials: LoginCredentials): Observable<AuthResponse> {
-    // Mock login - replace with actual API call
-    return new Observable(observer => {
-      setTimeout(() => {
-        if (credentials.username && credentials.password) {
-          const user: User = {
-            id: 1,
-            username: credentials.username,
-            email: `${credentials.username}@mobilemoney.com`,
-            firstName: 'System',
-            lastName: 'Administrator',
-            roles: ['admin'],
-            permissions: ['read', 'write', 'delete'],
-            isVerified: true,
-            twoFactorEnabled: false,
-            lastLogin: new Date(),
-            avatar: 'assets/images/avatars/admin.png'
-          };
-
-          const authResponse: AuthResponse = {
-            user,
-            accessToken: this.generateMockToken(user),
-            refreshToken: this.generateMockRefreshToken(user),
-            expiresIn: 3600
-          };
-
-          this.setAuthData(authResponse, credentials.rememberMe || false);
-          this.scheduleTokenRefresh(authResponse.expiresIn);
-
-          observer.next(authResponse);
-          observer.complete();
-        } else {
-          observer.error(new Error('Invalid credentials'));
-        }
-      }, 1500);
-    });
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials)
+      .pipe(
+        tap(response => {
+          if (!response.requiresTwoFactor) {
+            this.setAuthData(response, credentials.rememberMe || false);
+            this.scheduleTokenRefresh(response.expiresIn);
+          }
+        }),
+        catchError(error => {
+          return throwError(() => this.handleAuthError(error));
+        })
+      );
   }
 
+  // Two-Factor Authentication methods
+  verifyTwoFactorCode(code: string, rememberDevice: boolean = false): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/verify-2fa`, {
+      code,
+      rememberDevice
+    }).pipe(
+      tap(response => {
+        this.setAuthData(response, false);
+        this.scheduleTokenRefresh(response.expiresIn);
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  resendTwoFactorCode(): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.API_URL}/resend-2fa`, {})
+      .pipe(
+        catchError(error => {
+          return throwError(() => this.handleAuthError(error));
+        })
+      );
+  }
+
+  verifyBackupCode(backupCode: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/verify-backup-code`, {
+      backupCode
+    }).pipe(
+      tap(response => {
+        this.setAuthData(response, false);
+        this.scheduleTokenRefresh(response.expiresIn);
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  // Email verification methods
+  resendVerificationEmail(email: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.API_URL}/resend-verification`,
+      { email }
+    ).pipe(
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  verifyEmail(token: string): Observable<{ success: boolean; user: User }> {
+    return this.http.post<{ success: boolean; user: User }>(
+      `${this.API_URL}/verify-email`,
+      { token }
+    ).pipe(
+      tap(response => {
+        if (response.success && this.currentUserValue) {
+          // Update current user with verified status
+          const updatedUser = { ...this.currentUserValue, isVerified: true };
+          this.currentUserSubject.next(updatedUser);
+          this.updateStoredUser(updatedUser);
+        }
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  // Account unlock methods
+  sendUnlockAccountEmail(email: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.API_URL}/send-unlock-account`,
+      { email }
+    ).pipe(
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  unlockAccount(token: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.API_URL}/unlock-account`,
+      { token }
+    ).pipe(
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  // OAuth methods
+  exchangeOAuthCode(code: string, provider: string): Observable<OAuthResponse> {
+    return this.http.post<OAuthResponse>(`${this.API_URL}/oauth/callback`, {
+      code,
+      provider,
+      grant_type: 'authorization_code'
+    }).pipe(
+      tap(response => {
+        this.setAuthData(response, false);
+        this.scheduleTokenRefresh(response.expiresIn);
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  authenticateWithOAuthToken(accessToken: string, idToken: string | null, provider: string): Observable<OAuthResponse> {
+    return this.http.post<OAuthResponse>(`${this.API_URL}/oauth/token`, {
+      access_token: accessToken,
+      id_token: idToken,
+      provider
+    }).pipe(
+      tap(response => {
+        this.setAuthData(response, false);
+        this.scheduleTokenRefresh(response.expiresIn);
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  // Password reset methods
+  forgotPassword(email: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.API_URL}/forgot-password`,
+      { email }
+    ).pipe(
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.API_URL}/reset-password`,
+      { token, newPassword }
+    ).pipe(
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  // Two-Factor setup methods
+  setupTwoFactor(): Observable<{ secret: string; qrCode: string; recoveryCodes: string[] }> {
+    return this.http.post<{ secret: string; qrCode: string; recoveryCodes: string[] }>(
+      `${this.API_URL}/setup-2fa`,
+      {}
+    ).pipe(
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  enableTwoFactor(verificationCode: string): Observable<TwoFactorResponse> {
+    return this.http.post<TwoFactorResponse>(
+      `${this.API_URL}/enable-2fa`,
+      { verificationCode }
+    ).pipe(
+      tap(response => {
+        if (response.success && this.currentUserValue) {
+          // Update current user with 2FA status
+          const updatedUser = { ...this.currentUserValue, twoFactorEnabled: true };
+          this.currentUserSubject.next(updatedUser);
+          this.updateStoredUser(updatedUser);
+        }
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  disableTwoFactor(verificationCode: string): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(
+      `${this.API_URL}/disable-2fa`,
+      { verificationCode }
+    ).pipe(
+      tap(response => {
+        if (response.success && this.currentUserValue) {
+          // Update current user with 2FA status
+          const updatedUser = { ...this.currentUserValue, twoFactorEnabled: false };
+          this.currentUserSubject.next(updatedUser);
+          this.updateStoredUser(updatedUser);
+        }
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+  }
+
+  // Logout
   logout(redirectTo: string = '/auth/login'): void {
     this.clearAuthData();
     this.clearRefreshTimeout();
@@ -118,6 +320,7 @@ export class AuthService {
     this.router.navigate([redirectTo]);
   }
 
+  // Token management
   refreshToken(): Observable<TokenRefreshResponse> {
     const refreshToken = this.getStoredRefreshToken();
     
@@ -126,29 +329,22 @@ export class AuthService {
       return throwError(() => new Error('No refresh token available'));
     }
 
-    // Mock token refresh - replace with actual API call
-    return new Observable(observer => {
-      setTimeout(() => {
-        const user = this.currentUserValue;
-        if (user) {
-          const response: TokenRefreshResponse = {
-            accessToken: this.generateMockToken(user),
-            refreshToken: this.generateMockRefreshToken(user),
-            expiresIn: 3600
-          };
-
-          this.setToken(response.accessToken);
-          this.scheduleTokenRefresh(response.expiresIn);
-
-          observer.next(response);
-          observer.complete();
-        } else {
-          observer.error(new Error('User not authenticated'));
-        }
-      }, 1000);
-    });
+    return this.http.post<TokenRefreshResponse>(`${this.API_URL}/refresh`, {
+      refreshToken
+    }).pipe(
+      tap(response => {
+        this.setToken(response.accessToken);
+        this.setRefreshToken(response.refreshToken);
+        this.scheduleTokenRefresh(response.expiresIn);
+      }),
+      catchError(error => {
+        this.logout();
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
   }
 
+  // Authentication checks
   isAuthenticated(): boolean {
     const token = this.getStoredToken();
     if (!token) return false;
@@ -158,6 +354,10 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  isVerified(): boolean {
+    return this.currentUserValue?.isVerified || false;
   }
 
   hasRole(role: string | string[]): boolean {
@@ -188,6 +388,7 @@ export class AuthService {
     return true;
   }
 
+  // Storage management
   private setAuthData(authResponse: AuthResponse, rememberMe: boolean): void {
     if (isPlatformBrowser(this.platformId)) {
       const storage = rememberMe ? localStorage : sessionStorage;
@@ -201,11 +402,27 @@ export class AuthService {
     }
   }
 
+  private updateStoredUser(user: User): void {
+    if (isPlatformBrowser(this.platformId)) {
+      const rememberMe = localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem(this.USER_KEY, JSON.stringify(user));
+    }
+  }
+
   private setToken(token: string): void {
     if (isPlatformBrowser(this.platformId)) {
       const rememberMe = localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
       const storage = rememberMe ? localStorage : sessionStorage;
       storage.setItem(this.TOKEN_KEY, token);
+    }
+  }
+
+  private setRefreshToken(token: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      const rememberMe = localStorage.getItem(this.REMEMBER_ME_KEY) === 'true';
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem(this.REFRESH_TOKEN_KEY, token);
     }
   }
 
@@ -249,6 +466,7 @@ export class AuthService {
     }
   }
 
+  // Token refresh management
   private clearRefreshTimeout(): void {
     if (this.tokenRefreshTimeout) {
       clearTimeout(this.tokenRefreshTimeout);
@@ -262,23 +480,73 @@ export class AuthService {
     // Refresh token 5 minutes before expiry
     const refreshTime = (expiresIn - 300) * 1000;
     
-    this.tokenRefreshTimeout = setTimeout(() => {
-      this.refreshToken().subscribe({
-        error: () => this.logout()
-      });
-    }, refreshTime);
+    if (refreshTime > 0) {
+      this.tokenRefreshTimeout = setTimeout(() => {
+        this.refreshToken().subscribe({
+          error: () => this.logout()
+        });
+      }, refreshTime);
+    }
   }
 
+  private getTokenExpiration(): number {
+    const token = this.getStoredToken();
+    if (!token) return 0;
+
+    try {
+      const decoded = this.jwtHelper.decodeToken(token);
+      return decoded.exp - Math.floor(Date.now() / 1000);
+    } catch {
+      return 0;
+    }
+  }
+
+  // Error handling
+  private handleAuthError(error: any): Error {
+    if (error.error && error.error.message) {
+      return new Error(error.error.message);
+    }
+    
+    if (error.status === 0) {
+      return new Error('Unable to connect to authentication server');
+    }
+    
+    if (error.status === 401) {
+      return new Error('Authentication failed');
+    }
+    
+    if (error.status === 403) {
+      return new Error('Access denied');
+    }
+    
+    if (error.status === 429) {
+      return new Error('Too many requests. Please try again later.');
+    }
+    
+    return new Error(error.message || 'An unexpected error occurred');
+  }
+
+  // HTTP interceptor helper
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getStoredToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+
+  // Mock methods for development (remove in production)
   private generateMockToken(user: User): string {
     // In real implementation, this would be a JWT from the server
     const payload = {
       sub: user.id,
       username: user.username,
+      email: user.email,
       roles: user.roles,
       permissions: user.permissions,
       exp: Math.floor(Date.now() / 1000) + 3600 // 1 hour
     };
-    return btoa(JSON.stringify(payload));
+    return `mock.${btoa(JSON.stringify(payload))}.signature`;
   }
 
   private generateMockRefreshToken(user: User): string {
@@ -287,6 +555,6 @@ export class AuthService {
       type: 'refresh',
       exp: Math.floor(Date.now() / 1000) + 86400 // 24 hours
     };
-    return btoa(JSON.stringify(payload));
+    return `mock.refresh.${btoa(JSON.stringify(payload))}.signature`;
   }
 }
