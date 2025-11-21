@@ -1,0 +1,159 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <img src="assets/images/logo.png" alt="Logo" class="logo">
+      <h2>Create Account</h2>
+      <p>Join us today</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <div class="row">
+        <div class="col-6">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              class="form-control"
+              [class.is-invalid]="f.firstName.touched && f.firstName.errors"
+              placeholder="Enter your first name">
+            <div class="invalid-feedback" *ngIf="f.firstName.touched && f.firstName.errors">
+              <span *ngIf="f.firstName.errors.required">First name is required</span>
+              <span *ngIf="f.firstName.errors.minlength">First name must be at least 2 characters</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              formControlName="lastName"
+              class="form-control"
+              [class.is-invalid]="f.lastName.touched && f.lastName.errors"
+              placeholder="Enter your last name">
+            <div class="invalid-feedback" *ngIf="f.lastName.touched && f.lastName.errors">
+              <span *ngIf="f.lastName.errors.required">Last name is required</span>
+              <span *ngIf="f.lastName.errors.minlength">Last name must be at least 2 characters</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="f.email.touched && f.email.errors"
+          placeholder="Enter your email">
+        <div class="invalid-feedback" *ngIf="f.email.touched && f.email.errors">
+          <span *ngIf="f.email.errors.required">Email is required</span>
+          <span *ngIf="f.email.errors.email">Please enter a valid email</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          class="form-control"
+          [class.is-invalid]="f.phone.touched && f.phone.errors"
+          placeholder="Enter your phone number">
+        <div class="invalid-feedback" *ngIf="f.phone.touched && f.phone.errors">
+          <span *ngIf="f.phone.errors.required">Phone number is required</span>
+          <span *ngIf="f.phone.errors.pattern">Please enter a valid phone number</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-input-container">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.is-invalid]="f.password.touched && f.password.errors"
+            placeholder="Create a password">
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility('password')">
+            <i class="icon" [class.icon-eye]="!showPassword" [class.icon-eye-off]="showPassword"></i>
+          </button>
+        </div>
+        <div class="password-strength" *ngIf="f.password.value">
+          <div class="strength-bar">
+            <div class="strength-fill" [style.width.%]="getPasswordStrengthPercentage()" 
+                 [style.background-color]="getPasswordStrength().color"></div>
+          </div>
+          <span class="strength-text" [style.color]="getPasswordStrength().color">
+            {{ getPasswordStrength().strength }}
+          </span>
+        </div>
+        <div class="invalid-feedback" *ngIf="f.password.touched && f.password.errors">
+          <span *ngIf="f.password.errors.required">Password is required</span>
+          <span *ngIf="f.password.errors.minlength">Password must be at least 8 characters</span>
+          <span *ngIf="f.password.errors.pattern">
+            Password must contain uppercase, lowercase, number and special character
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="password-input-container">
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            class="form-control"
+            [class.is-invalid]="f.confirmPassword.touched && f.confirmPassword.errors"
+            placeholder="Confirm your password">
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility('confirmPassword')">
+            <i class="icon" [class.icon-eye]="!showConfirmPassword" [class.icon-eye-off]="showConfirmPassword"></i>
+          </button>
+        </div>
+        <div class="invalid-feedback" *ngIf="f.confirmPassword.touched && f.confirmPassword.errors">
+          <span *ngIf="f.confirmPassword.errors.required">Please confirm your password</span>
+          <span *ngIf="f.confirmPassword.errors.passwordMismatch">Passwords do not match</span>
+        </div>
+      </div>
+
+      <div class="form-group terms-group">
+        <label class="checkbox-container">
+          <input type="checkbox" formControlName="acceptTerms">
+          <span class="checkmark"></span>
+          I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+        </label>
+        <div class="invalid-feedback" *ngIf="f.acceptTerms.touched && f.acceptTerms.errors">
+          You must accept the terms and conditions
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="loading">
+        <span *ngIf="loading" class="spinner"></span>
+        {{ loading ? 'Creating Account...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p>Already have an account? 
+        <a (click)="navigateToLogin()" class="login-link">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>

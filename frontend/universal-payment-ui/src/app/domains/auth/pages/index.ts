@@ -1,0 +1,10 @@
+export { LoginComponent } from './login/login.component';
+export { RegisterComponent } from './register/register.component';
+export { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+export { ResetPasswordComponent } from './reset-password/reset-password.component';
+export { VerifyEmailComponent } from './verify-email/verify-email.component';
+export { ResendVerificationComponent } from './resend-verification/resend-verification.component';
+export { TwoFactorAuthComponent } from './two-factor-auth/two-factor-auth.component';
+export { LockAccountComponent } from './lock-account/lock-account.component';
+export { LogoutComponent } from './logout/logout.component';
+export { OauthCallbackComponent } from './oauth-callback/oauth-callback.component';
