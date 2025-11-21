@@ -23,17 +23,26 @@ export const routes: Routes = [
       { path: 'reset-password/:token', component: ResetPasswordComponent, canActivate: [GuestGuard] },
       { path: 'verify-email/:token', component: VerifyEmailComponent, canActivate: [GuestGuard] },
       { path: 'resend-verification', component: ResendVerificationComponent, canActivate: [GuestGuard] },
+
+      // Optional: protect or leave public
       { path: 'lock', component: LockAccountComponent },
+
       { path: '2fa', component: TwoFactorAuthComponent, canActivate: [AuthGuard] },
-      { path: 'oauth/callback', component: OauthCallbackComponent, canActivate: [GuestGuard] },
+
+      {
+        path: 'oauth',
+        children: [
+          { path: 'callback', component: OauthCallbackComponent, canActivate: [GuestGuard] }
+        ]
+      },
+
       { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
+
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },
 
-  // Optional: default redirect to login
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
 
-  // Wildcard route for unknown paths
-  { path: '**', redirectTo: 'auth/login' }
+  { path: '**', redirectTo: 'auth/login', pathMatch: 'full' }
 ];
