@@ -3,8 +3,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { NotificationService } from '../../../../shared/services/notification.service';
+import { AuthenticationService } from '../../../../core/authentication/auth.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
