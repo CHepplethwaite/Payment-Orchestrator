@@ -4,7 +4,8 @@ import { AuthService } from '../../../../core/authentication/auth.service';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   email = '';
@@ -14,7 +15,7 @@ export class LoginComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
+    this.auth.login({ username: this.email, password: this.password }).subscribe({
       next: () => {
         // Redirect after successful login
         this.router.navigate(['/dashboard']);
