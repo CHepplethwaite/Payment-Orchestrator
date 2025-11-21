@@ -1,0 +1,56 @@
+<div class="resend-verification-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Resend Verification Email</h2>
+      <p class="subtitle">Enter your email address to receive a new verification link</p>
+    </div>
+
+    <div class="card-body">
+      <form [formGroup]="resendForm" (ngSubmit)="onSubmit()" *ngIf="!success; else successTemplate">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-control"
+            [class.is-invalid]="f.email.invalid && (f.email.touched || f.email.dirty)"
+            placeholder="Enter your email address">
+          <div class="invalid-feedback" *ngIf="f.email.invalid && f.email.touched">
+            <span *ngIf="f.email.errors?.required">Email is required</span>
+            <span *ngIf="f.email.errors?.email">Please enter a valid email address</span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          [disabled]="loading || countdown > 0">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
+          {{ countdown > 0 ? ('Resend in ' + countdown + 's') : 'Send Verification Email' }}
+        </button>
+      </form>
+
+      <ng-template #successTemplate>
+        <div class="success-message text-center">
+          <div class="success-icon">✓</div>
+          <h3>Email Sent!</h3>
+          <p>We've sent a verification link to your email address. Please check your inbox and spam folder.</p>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            (click)="onSubmit()"
+            [disabled]="countdown > 0">
+            {{ countdown > 0 ? ('Resend in ' + countdown + 's') : 'Resend Email' }}
+          </button>
+        </div>
+      </ng-template>
+
+      <div class="text-center links">
+        <a (click)="navigateToLogin()" class="link">Back to Login</a>
+        <span class="divider">•</span>
+        <a (click)="navigateToRegister()" class="link">Create New Account</a>
+      </div>
+    </div>
+  </div>
+</div>
