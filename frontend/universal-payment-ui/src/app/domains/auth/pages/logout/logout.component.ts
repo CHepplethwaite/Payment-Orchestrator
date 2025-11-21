@@ -14,7 +14,7 @@ import { NotificationService } from '../../../../shared/services/notification.se
 export class LogoutComponent implements OnInit {
 
   constructor(
-    private authService: AuthenticationService,
+    private authService: AuthService,
     private router: Router,
     private notificationService: NotificationService
   ) {}

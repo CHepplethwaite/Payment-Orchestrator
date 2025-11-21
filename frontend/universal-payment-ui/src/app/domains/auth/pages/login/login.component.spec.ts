@@ -1,31 +1,30 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
-import { AuthenticationService } from '../../../../core/authentication/auth.service';
+import { AuthService } from '../../../../core/authentication/auth.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authService: jasmine.SpyObj<AuthenticationService>;
+  let authService: jasmine.SpyObj<AuthService>;
   let notificationService: jasmine.SpyObj<NotificationService>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthenticationService', ['login', 'currentUserValue']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'currentUserValue']);
     const notificationServiceSpy = jasmine.createSpyObj('NotificationService', ['showSuccess', 'showError']);
 
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      imports: [ReactiveFormsModule, RouterTestingModule],
+      imports: [ReactiveFormsModule,],
       providers: [
-        { provide: AuthenticationService, useValue: authServiceSpy },
+        { provide: AuthService, useValue: authServiceSpy },
         { provide: NotificationService, useValue: notificationServiceSpy }
       ]
     }).compileComponents();
 
-    authService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     notificationService = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
   });
 
