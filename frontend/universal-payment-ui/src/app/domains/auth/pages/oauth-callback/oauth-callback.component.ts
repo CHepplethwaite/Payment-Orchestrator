@@ -37,7 +37,7 @@ import { NotificationService } from '../../../../core/services/notification/noti
       </div>
     </div>
   `,
-  styleUrls: ['./oauth-callback.component.scss'],
+  styleUrls: ['./oauth-callback.component.css'],
   standalone: true,
   imports: [CommonModule, RouterModule] // Add CommonModule here
 })

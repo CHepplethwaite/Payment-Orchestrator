@@ -18,7 +18,7 @@ interface PasswordStrength {
 @Component({
   selector: 'app-reset-password',
   templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss'],
+  styleUrls: ['./reset-password.component.css'],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule]
 })

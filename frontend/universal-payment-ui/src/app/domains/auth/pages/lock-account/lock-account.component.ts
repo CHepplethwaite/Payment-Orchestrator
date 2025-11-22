@@ -10,7 +10,7 @@ import { NotificationService } from '../../../../core/services/notification/noti
 @Component({
   selector: 'app-lock-account',
   templateUrl: './lock-account.component.html',
-  styleUrls: ['./lock-account.component.scss'],
+  styleUrls: ['./lock-account.component.css'],
   standalone: true,
   imports: [
     CommonModule,        // Required for *ngIf, *ngFor, etc.

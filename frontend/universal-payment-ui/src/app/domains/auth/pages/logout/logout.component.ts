@@ -9,7 +9,8 @@ import { NotificationService } from '../../../../core/services/notification/noti
     <div class="logout-container">
       <p>Logging out...</p>
     </div>
-  `
+  `,
+  standalone: true
 })
 export class LogoutComponent implements OnInit {
 

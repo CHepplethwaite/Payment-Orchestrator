@@ -10,7 +10,7 @@ import { NotificationService } from '../../../../core/services/notification/noti
 @Component({
   selector: 'app-resend-verification',
   templateUrl: './resend-verification.component.html',
-  styleUrls: ['./resend-verification.component.scss'], // or .css if using CSS
+  styleUrls: ['./resend-verification.component.css'], // or .css if using CSS
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule] // Add required imports
 })

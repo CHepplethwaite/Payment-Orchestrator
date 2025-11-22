@@ -17,7 +17,7 @@ interface PasswordStrength {
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
+  styleUrls: ['./register.component.css'],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule]
 })
