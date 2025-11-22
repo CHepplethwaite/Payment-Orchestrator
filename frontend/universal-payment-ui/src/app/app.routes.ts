@@ -10,8 +10,8 @@ import { LockAccountComponent } from './domains/auth/pages/lock-account/lock-acc
 import { TwoFactorAuthComponent } from './domains/auth/pages/two-factor-auth/two-factor-auth.component';
 import { OauthCallbackComponent } from './domains/auth/pages/oauth-callback/oauth-callback.component';
 
-import { AuthGuard } from './core/guards/auth.guard';      // protects routes for logged-in users
-import { GuestGuard } from './core/guards/guest.guard';    // protects routes for guests only
+import { AuthGuard } from './core/authentication/auth.guard';      // protects routes for logged-in users
+import { GuestGuard } from './core/authentication/guest.guard';    // protects routes for guests only
 
 export const routes: Routes = [
   {

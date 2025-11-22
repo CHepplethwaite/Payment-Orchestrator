@@ -1,33 +1,24 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { CanActivate, CanActivateChild, CanLoad, Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { AuthService } from '../services/auth.service';
+import { CanActivate, CanActivateChild, Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from '../authentication/auth.service';
+import { AUTH_SERVICE } from '../tokens/auth-service.token';
 
 export interface GuestGuardConfig {
-  // Allow access even if authenticated (useful for public pages that authenticated users can still access)
   allowAuthenticated?: boolean;
-  
-  // Specific roles that are allowed (empty = all roles treated as guests)
   allowedRoles?: string[];
-  
-  // Redirect route for authenticated users
   redirectTo?: string;
-  
-  // Whether to preserve the attempted URL for later use
   preserveAttemptedUrl?: boolean;
-  
-  // Query parameters to pass to redirect
   redirectQueryParams?: { [key: string]: any };
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class GuestGuard implements CanActivate, CanActivateChild, CanLoad {
+export class GuestGuard implements CanActivate, CanActivateChild {
   constructor(
-    private authService: AuthService,
+    @Inject(AUTH_SERVICE) private authService: AuthService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
@@ -46,11 +37,7 @@ export class GuestGuard implements CanActivate, CanActivateChild, CanLoad {
     return this.checkGuestAccess(route, state.url);
   }
 
-  canLoad(): Observable<boolean> | Promise<boolean> | boolean {
-    return this.checkGuestAccess();
-  }
-
-  private checkGuestAccess(route?: ActivatedRouteSnapshot, redirectUrl?: string): Observable<boolean> | boolean {
+  private checkGuestAccess(route?: ActivatedRouteSnapshot, redirectUrl?: string): boolean {
     // Server-side rendering support
     if (!isPlatformBrowser(this.platformId)) {
       return true;
@@ -63,7 +50,7 @@ export class GuestGuard implements CanActivate, CanActivateChild, CanLoad {
       return true;
     }
 
-    // Check authentication status
+    // Check authentication status using your AuthService methods
     if (this.authService.isAuthenticated()) {
       const user = this.authService.currentUserValue;
       
@@ -129,13 +116,12 @@ export class GuestGuard implements CanActivate, CanActivateChild, CanLoad {
   }
 
   private getDefaultRedirectRoute(user: any): string {
-    // Customize this based on your application's requirements
-    
-    if (user?.roles?.includes('admin')) {
+    // Use the user data from your AuthService
+    if (this.authService.hasRole('admin')) {
       return '/admin/dashboard';
     }
     
-    if (user?.roles?.includes('moderator')) {
+    if (this.authService.hasRole('moderator')) {
       return '/moderator/dashboard';
     }
 
@@ -144,8 +130,8 @@ export class GuestGuard implements CanActivate, CanActivateChild, CanLoad {
       return '/profile/complete';
     }
 
-    // Check if user needs email verification
-    if (!user?.isVerified) {
+    // Check if user needs email verification using your AuthService method
+    if (!this.authService.isVerified()) {
       return '/auth/verification-required';
     }
 

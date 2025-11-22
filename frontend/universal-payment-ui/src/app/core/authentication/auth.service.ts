@@ -93,7 +93,7 @@ export class AuthService {
     return this.getStoredToken();
   }
 
-  public get refreshToken(): string | null {
+  public get refreshTokenValue(): string | null {
     return this.getStoredRefreshToken();
   }
 
@@ -322,7 +322,7 @@ export class AuthService {
 
   // Token management
   refreshToken(): Observable<TokenRefreshResponse> {
-    const refreshToken = this.getStoredRefreshToken();
+    const refreshToken = this.refreshTokenValue;
     
     if (!refreshToken) {
       this.logout();

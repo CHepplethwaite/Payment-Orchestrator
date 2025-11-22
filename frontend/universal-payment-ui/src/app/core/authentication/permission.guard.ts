@@ -8,7 +8,7 @@ import {
   UrlTree 
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AuthService } from '../authentication/auth.service';
+import { AuthService } from './auth.service';
 
 export interface PermissionConfig {
   requireAll?: boolean; // AND operation instead of OR

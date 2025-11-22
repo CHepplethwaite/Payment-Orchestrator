@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
     if (this.auth.isAuthenticated()) {
       this.logger.debug('AuthGuard: Access granted', { 
         route: state.url,
-        user: this.auth.getCurrentUser() 
+        user: this.auth.currentUserValue
       });
       return true;
     }
