@@ -16,11 +16,11 @@
               id="firstName"
               formControlName="firstName"
               class="form-control"
-              [class.is-invalid]="f.firstName.touched && f.firstName.errors"
+              [class.is-invalid]="f['firstName'].touched && f['firstName'].errors"
               placeholder="Enter your first name">
-            <div class="invalid-feedback" *ngIf="f.firstName.touched && f.firstName.errors">
-              <span *ngIf="f.firstName.errors.required">First name is required</span>
-              <span *ngIf="f.firstName.errors.minlength">First name must be at least 2 characters</span>
+            <div class="invalid-feedback" *ngIf="f['firstName'].touched && f['firstName'].errors">
+              <span *ngIf="f['firstName'].errors?.['required']">First name is required</span>
+              <span *ngIf="f['firstName'].errors?.['minlength']">First name must be at least 2 characters</span>
             </div>
           </div>
         </div>
@@ -32,11 +32,11 @@
               id="lastName"
               formControlName="lastName"
               class="form-control"
-              [class.is-invalid]="f.lastName.touched && f.lastName.errors"
+              [class.is-invalid]="f['lastName'].touched && f['lastName'].errors"
               placeholder="Enter your last name">
-            <div class="invalid-feedback" *ngIf="f.lastName.touched && f.lastName.errors">
-              <span *ngIf="f.lastName.errors.required">Last name is required</span>
-              <span *ngIf="f.lastName.errors.minlength">Last name must be at least 2 characters</span>
+            <div class="invalid-feedback" *ngIf="f['lastName'].touched && f['lastName'].errors">
+              <span *ngIf="f['lastName'].errors?.['required']">Last name is required</span>
+              <span *ngIf="f['lastName'].errors?.['minlength']">Last name must be at least 2 characters</span>
             </div>
           </div>
         </div>
@@ -49,11 +49,11 @@
           id="email"
           formControlName="email"
           class="form-control"
-          [class.is-invalid]="f.email.touched && f.email.errors"
+          [class.is-invalid]="f['email'].touched && f['email'].errors"
           placeholder="Enter your email">
-        <div class="invalid-feedback" *ngIf="f.email.touched && f.email.errors">
-          <span *ngIf="f.email.errors.required">Email is required</span>
-          <span *ngIf="f.email.errors.email">Please enter a valid email</span>
+        <div class="invalid-feedback" *ngIf="f['email'].touched && f['email'].errors">
+          <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+          <span *ngIf="f['email'].errors?.['email']">Please enter a valid email</span>
         </div>
       </div>
 
@@ -64,11 +64,11 @@
           id="phone"
           formControlName="phone"
           class="form-control"
-          [class.is-invalid]="f.phone.touched && f.phone.errors"
+          [class.is-invalid]="f['phone'].touched && f['phone'].errors"
           placeholder="Enter your phone number">
-        <div class="invalid-feedback" *ngIf="f.phone.touched && f.phone.errors">
-          <span *ngIf="f.phone.errors.required">Phone number is required</span>
-          <span *ngIf="f.phone.errors.pattern">Please enter a valid phone number</span>
+        <div class="invalid-feedback" *ngIf="f['phone'].touched && f['phone'].errors">
+          <span *ngIf="f['phone'].errors?.['required']">Phone number is required</span>
+          <span *ngIf="f['phone'].errors?.['pattern']">Please enter a valid phone number</span>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
             id="password"
             formControlName="password"
             class="form-control"
-            [class.is-invalid]="f.password.touched && f.password.errors"
+            [class.is-invalid]="f['password'].touched && f['password'].errors"
             placeholder="Create a password">
           <button
             type="button"
@@ -89,7 +89,7 @@
             <i class="icon" [class.icon-eye]="!showPassword" [class.icon-eye-off]="showPassword"></i>
           </button>
         </div>
-        <div class="password-strength" *ngIf="f.password.value">
+        <div class="password-strength" *ngIf="f['password'].value">
           <div class="strength-bar">
             <div class="strength-fill" [style.width.%]="getPasswordStrengthPercentage()" 
                  [style.background-color]="getPasswordStrength().color"></div>
@@ -98,10 +98,10 @@
             {{ getPasswordStrength().strength }}
           </span>
         </div>
-        <div class="invalid-feedback" *ngIf="f.password.touched && f.password.errors">
-          <span *ngIf="f.password.errors.required">Password is required</span>
-          <span *ngIf="f.password.errors.minlength">Password must be at least 8 characters</span>
-          <span *ngIf="f.password.errors.pattern">
+        <div class="invalid-feedback" *ngIf="f['password'].touched && f['password'].errors">
+          <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+          <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 8 characters</span>
+          <span *ngIf="f['password'].errors?.['pattern']">
             Password must contain uppercase, lowercase, number and special character
           </span>
         </div>
@@ -115,7 +115,7 @@
             id="confirmPassword"
             formControlName="confirmPassword"
             class="form-control"
-            [class.is-invalid]="f.confirmPassword.touched && f.confirmPassword.errors"
+            [class.is-invalid]="f['confirmPassword'].touched && f['confirmPassword'].errors"
             placeholder="Confirm your password">
           <button
             type="button"
@@ -124,9 +124,9 @@
             <i class="icon" [class.icon-eye]="!showConfirmPassword" [class.icon-eye-off]="showConfirmPassword"></i>
           </button>
         </div>
-        <div class="invalid-feedback" *ngIf="f.confirmPassword.touched && f.confirmPassword.errors">
-          <span *ngIf="f.confirmPassword.errors.required">Please confirm your password</span>
-          <span *ngIf="f.confirmPassword.errors.passwordMismatch">Passwords do not match</span>
+        <div class="invalid-feedback" *ngIf="f['confirmPassword'].touched && f['confirmPassword'].errors">
+          <span *ngIf="f['confirmPassword'].errors?.['required']">Please confirm your password</span>
+          <span *ngIf="f['confirmPassword'].errors?.['passwordMismatch']">Passwords do not match</span>
         </div>
       </div>
 
@@ -136,7 +136,7 @@
           <span class="checkmark"></span>
           I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
         </label>
-        <div class="invalid-feedback" *ngIf="f.acceptTerms.touched && f.acceptTerms.errors">
+        <div class="invalid-feedback" *ngIf="f['acceptTerms'].touched && f['acceptTerms'].errors">
           You must accept the terms and conditions
         </div>
       </div>
@@ -144,7 +144,7 @@
       <button
         type="submit"
         class="btn btn-primary btn-block"
-        [disabled]="loading">
+        [disabled]="loading || registerForm.invalid">
         <span *ngIf="loading" class="spinner"></span>
         {{ loading ? 'Creating Account...' : 'Create Account' }}
       </button>

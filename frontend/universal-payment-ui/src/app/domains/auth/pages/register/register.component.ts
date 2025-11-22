@@ -1,18 +1,28 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { NotificationService } from '../../../../shared/services/notification.service';
+import { AuthService } from '../../../../core/authentication/auth.service';
+import { NotificationService } from '../../../../core/services/notification/notification.service';
+
+// Interface for password strength
+interface PasswordStrength {
+  strength: string;
+  color: string;
+  percentage: number;
+}
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule]
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-  registerForm: FormGroup;
+  registerForm!: FormGroup;
   loading = false;
   showPassword = false;
   showConfirmPassword = false;
@@ -21,7 +31,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthenticationService,
+    private authService: AuthService,
     private notificationService: NotificationService
   ) {}
 
@@ -36,53 +46,81 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.minLength(8),
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
       ]],
-      confirmPassword: ['', Validators.required],
-      acceptTerms: [false, Validators.requiredTrue]
+      confirmPassword: ['', [Validators.required]],
+      acceptTerms: [false, [Validators.requiredTrue]]
     }, {
       validators: this.passwordMatchValidator
     });
   }
 
-  get f() { return this.registerForm.controls; }
+  // Safe getter for form controls with proper typing
+  get f(): { [key: string]: AbstractControl } {
+    return this.registerForm.controls;
+  }
 
-  passwordMatchValidator(control: AbstractControl) {
+  // Password match validator
+  private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
     
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
     } else {
-      confirmPassword.setErrors(null);
+      if (confirmPassword && confirmPassword.errors?.['passwordMismatch']) {
+        const errors = { ...confirmPassword.errors };
+        delete errors['passwordMismatch'];
+        confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
+      }
     }
+    return null;
   }
 
-  onSubmit() {
-    if (this.registerForm.invalid) {
-      this.markFormGroupTouched();
-      return;
+  // Password strength calculation
+  getPasswordStrength(): PasswordStrength {
+    const password = this.registerForm.get('password')?.value || '';
+    
+    if (!password) {
+      return { strength: '', color: '#ddd', percentage: 0 };
     }
 
-    this.loading = true;
-    const { confirmPassword, acceptTerms, ...registrationData } = this.registerForm.value;
+    let strength = 0;
+    let feedback = '';
 
-    this.authService.register(registrationData)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.notificationService.showSuccess('Registration successful! Please check your email for verification.');
-          this.router.navigate(['/auth/login']);
-        },
-        error: (error) => {
-          this.notificationService.showError(error.message || 'Registration failed');
-          this.loading = false;
-        }
-      });
+    // Length check
+    if (password.length >= 8) strength += 25;
+    if (password.length >= 12) strength += 10;
+
+    // Character type checks
+    if (/[a-z]/.test(password)) strength += 15;
+    if (/[A-Z]/.test(password)) strength += 15;
+    if (/[0-9]/.test(password)) strength += 15;
+    if (/[@$!%*?&]/.test(password)) strength += 20;
+
+    // Determine strength level
+    let strengthText = '';
+    let color = '';
+
+    if (strength < 40) {
+      strengthText = 'Weak';
+      color = '#dc3545';
+    } else if (strength < 70) {
+      strengthText = 'Fair';
+      color = '#fd7e14';
+    } else if (strength < 90) {
+      strengthText = 'Good';
+      color = '#ffc107';
+    } else {
+      strengthText = 'Strong';
+      color = '#28a745';
+    }
+
+    return { strength: strengthText, color, percentage: Math.min(strength, 100) };
   }
 
-  private markFormGroupTouched() {
-    Object.keys(this.registerForm.controls).forEach(key => {
-      this.registerForm.get(key).markAsTouched();
-    });
+  // Get password strength percentage for progress bar
+  getPasswordStrengthPercentage(): number {
+    return this.getPasswordStrength().percentage;
   }
 
   togglePasswordVisibility(field: 'password' | 'confirmPassword') {
@@ -93,32 +131,45 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToLogin() {
-    this.router.navigate(['/auth/login']);
+  onSubmit() {
+    if (this.registerForm.invalid) {
+      this.markFormGroupTouched();
+      return;
+    }
+
+    this.loading = true;
+    
+    const formValue = this.registerForm.value;
+    
+    this.authService.register({
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      email: formValue.email,
+      phone: formValue.phone,
+      password: formValue.password,
+      acceptTerms: formValue.acceptTerms
+    }).pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          this.notificationService.showSuccess('Registration successful! Please check your email to verify your account.');
+          this.router.navigate(['/auth/login']);
+        },
+        error: (error) => {
+          this.loading = false;
+          this.notificationService.showError(error.message || 'Registration failed. Please try again.');
+        }
+      });
   }
 
-  getPasswordStrength(): { strength: string; color: string } {
-    const password = this.f.password.value;
-    if (!password) return { strength: '', color: '' };
-
-    const hasLower = /[a-z]/.test(password);
-    const hasUpper = /[A-Z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecial = /[@$!%*?&]/.test(password);
-    const length = password.length;
-
-    const score = [hasLower, hasUpper, hasNumber, hasSpecial, length >= 8].filter(Boolean).length;
-
-    switch (score) {
-      case 5:
-        return { strength: 'Strong', color: '#22c55e' };
-      case 4:
-        return { strength: 'Good', color: '#eab308' };
-      case 3:
-        return { strength: 'Fair', color: '#f59e0b' };
-      default:
-        return { strength: 'Weak', color: '#ef4444' };
+  private markFormGroupTouched() {
+    if (this.registerForm) {
+      this.registerForm.markAllAsTouched();
     }
+  }
+
+  navigateToLogin() {
+    this.router.navigate(['/auth/login']);
   }
 
   ngOnDestroy() {

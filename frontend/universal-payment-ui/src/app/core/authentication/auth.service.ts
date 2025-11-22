@@ -55,6 +55,24 @@ export interface OAuthResponse {
   isNewUser?: boolean;
 }
 
+export interface RegisterCredentials {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  acceptTerms: boolean;
+}
+
+export interface RegisterResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  requiresVerification?: boolean;
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -112,6 +130,22 @@ export class AuthService {
         })
       );
   }
+
+// Registration method
+register(credentials: RegisterCredentials): Observable<RegisterResponse> {
+  return this.http.post<RegisterResponse>(`${this.API_URL}/register`, credentials)
+    .pipe(
+      tap(response => {
+        if (!response.requiresVerification) {
+          this.setAuthData(response, false);
+          this.scheduleTokenRefresh(response.expiresIn);
+        }
+      }),
+      catchError(error => {
+        return throwError(() => this.handleAuthError(error));
+      })
+    );
+}
 
   // Two-Factor Authentication methods
   verifyTwoFactorCode(code: string, rememberDevice: boolean = false): Observable<AuthResponse> {

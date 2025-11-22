@@ -5,94 +5,106 @@
   min-height: 100vh;
   padding: 20px;
   background: #f5f5f5;
-
-  .card {
-    width: 100%;
-    max-width: 450px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 8px;
-
-    &-body {
-      padding: 3rem 2rem;
-
-      .processing-state,
-      .success-state,
-      .error-state {
-        text-align: center;
-
-        .spinner-border {
-          width: 3rem;
-          height: 3rem;
-          margin-bottom: 1.5rem;
-          color: #007bff;
-        }
-
-        .success-icon,
-        .error-icon {
-          font-size: 4rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .success-icon {
-          color: #28a745;
-        }
-
-        .error-icon {
-          color: #dc3545;
-        }
-
-        h3 {
-          margin-bottom: 1rem;
-          color: #333;
-          font-weight: 600;
-        }
-
-        p {
-          color: #666;
-          margin-bottom: 2rem;
-          font-size: 1.1rem;
-          line-height: 1.5;
-        }
-      }
-
-      .error-state {
-        .error-actions {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          .btn {
-            min-width: 120px;
-            padding: 0.75rem 1.5rem;
-
-            &-primary {
-              background: #007bff;
-              border: none;
-
-              &:hover {
-                background: #0056b3;
-              }
-            }
-
-            &-outline-secondary {
-              border-color: #6c757d;
-              color: #6c757d;
-
-              &:hover {
-                background: #6c757d;
-                color: white;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
-// Animation for smooth transitions
+.oauth-callback-container .card {
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 8px;
+}
+
+.oauth-callback-container .card-body {
+  padding: 3rem 2rem;
+}
+
+.oauth-callback-container .card-body .processing-state,
+.oauth-callback-container .card-body .success-state,
+.oauth-callback-container .card-body .error-state {
+  text-align: center;
+}
+
+.oauth-callback-container .card-body .processing-state .spinner-border,
+.oauth-callback-container .card-body .success-state .spinner-border,
+.oauth-callback-container .card-body .error-state .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1.5rem;
+  color: #007bff;
+}
+
+.oauth-callback-container .card-body .processing-state .success-icon,
+.oauth-callback-container .card-body .success-state .success-icon,
+.oauth-callback-container .card-body .error-state .success-icon,
+.oauth-callback-container .card-body .processing-state .error-icon,
+.oauth-callback-container .card-body .success-state .error-icon,
+.oauth-callback-container .card-body .error-state .error-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.oauth-callback-container .card-body .processing-state .success-icon,
+.oauth-callback-container .card-body .success-state .success-icon,
+.oauth-callback-container .card-body .error-state .success-icon {
+  color: #28a745;
+}
+
+.oauth-callback-container .card-body .processing-state .error-icon,
+.oauth-callback-container .card-body .success-state .error-icon,
+.oauth-callback-container .card-body .error-state .error-icon {
+  color: #dc3545;
+}
+
+.oauth-callback-container .card-body .processing-state h3,
+.oauth-callback-container .card-body .success-state h3,
+.oauth-callback-container .card-body .error-state h3 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.oauth-callback-container .card-body .processing-state p,
+.oauth-callback-container .card-body .success-state p,
+.oauth-callback-container .card-body .error-state p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.oauth-callback-container .card-body .error-state .error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.oauth-callback-container .card-body .error-state .error-actions .btn {
+  min-width: 120px;
+  padding: 0.75rem 1.5rem;
+}
+
+.oauth-callback-container .card-body .error-state .error-actions .btn-primary {
+  background: #007bff;
+  border: none;
+}
+
+.oauth-callback-container .card-body .error-state .error-actions .btn-primary:hover {
+  background: #0056b3;
+}
+
+.oauth-callback-container .card-body .error-state .error-actions .btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.oauth-callback-container .card-body .error-state .error-actions .btn-outline-secondary:hover {
+  background: #6c757d;
+  color: white;
+}
+
+/* Animation for smooth transitions */
 .processing-state,
 .success-state,
 .error-state {
@@ -110,27 +122,23 @@
   }
 }
 
-// Responsive design
+/* Responsive design */
 @media (max-width: 576px) {
   .oauth-callback-container {
     padding: 10px;
-
-    .card {
-      &-body {
-        padding: 2rem 1.5rem;
-
-        .error-state {
-          .error-actions {
-            flex-direction: column;
-            align-items: center;
-
-            .btn {
-              width: 100%;
-              max-width: 200px;
-            }
-          }
-        }
-      }
-    }
+  }
+  
+  .oauth-callback-container .card-body {
+    padding: 2rem 1.5rem;
+  }
+  
+  .oauth-callback-container .card-body .error-state .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .oauth-callback-container .card-body .error-state .error-actions .btn {
+    width: 100%;
+    max-width: 200px;
   }
 }

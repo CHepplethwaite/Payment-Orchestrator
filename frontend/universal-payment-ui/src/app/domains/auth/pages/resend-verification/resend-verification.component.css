@@ -5,136 +5,134 @@
   min-height: 100vh;
   padding: 20px;
   background: #f5f5f5;
-
-  .card {
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 8px;
-
-    &-header {
-      text-align: center;
-      background: white;
-      border-bottom: 1px solid #eee;
-      padding: 2rem;
-
-      h2 {
-        margin: 0 0 0.5rem 0;
-        color: #333;
-        font-weight: 600;
-      }
-
-      .subtitle {
-        color: #666;
-        margin: 0;
-        font-size: 0.9rem;
-      }
-    }
-
-    &-body {
-      padding: 2rem;
-
-      .form-group {
-        margin-bottom: 1.5rem;
-
-        label {
-          font-weight: 500;
-          margin-bottom: 0.5rem;
-          color: #333;
-        }
-
-        .form-control {
-          padding: 0.75rem;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          transition: border-color 0.2s;
-
-          &:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-          }
-
-          &.is-invalid {
-            border-color: #dc3545;
-          }
-        }
-      }
-
-      .btn {
-        padding: 0.75rem;
-        border-radius: 4px;
-        font-weight: 500;
-        transition: all 0.2s;
-
-        &-primary {
-          background: #007bff;
-          border: none;
-
-          &:hover:not(:disabled) {
-            background: #0056b3;
-          }
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-
-      .success-message {
-        padding: 1rem 0;
-
-        .success-icon {
-          font-size: 3rem;
-          color: #28a745;
-          margin-bottom: 1rem;
-        }
-
-        h3 {
-          color: #28a745;
-          margin-bottom: 1rem;
-        }
-
-        p {
-          color: #666;
-          margin-bottom: 1.5rem;
-        }
-      }
-
-      .links {
-        margin-top: 1.5rem;
-        font-size: 0.9rem;
-
-        .link {
-          color: #007bff;
-          text-decoration: none;
-          cursor: pointer;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-
-        .divider {
-          margin: 0 0.5rem;
-          color: #999;
-        }
-      }
-    }
-  }
 }
 
-// Responsive design
+.resend-verification-container .card {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 8px;
+}
+
+.resend-verification-container .card-header {
+  text-align: center;
+  background: white;
+  border-bottom: 1px solid #eee;
+  padding: 2rem;
+}
+
+.resend-verification-container .card-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.resend-verification-container .card-header .subtitle {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.resend-verification-container .card-body {
+  padding: 2rem;
+}
+
+.resend-verification-container .card-body .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.resend-verification-container .card-body .form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.resend-verification-container .card-body .form-group .form-control {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.resend-verification-container .card-body .form-group .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.resend-verification-container .card-body .form-group .form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.resend-verification-container .card-body .btn {
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.resend-verification-container .card-body .btn-primary {
+  background: #007bff;
+  border: none;
+}
+
+.resend-verification-container .card-body .btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.resend-verification-container .card-body .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resend-verification-container .card-body .success-message {
+  padding: 1rem 0;
+}
+
+.resend-verification-container .card-body .success-message .success-icon {
+  font-size: 3rem;
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+
+.resend-verification-container .card-body .success-message h3 {
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+
+.resend-verification-container .card-body .success-message p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.resend-verification-container .card-body .links {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.resend-verification-container .card-body .links .link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.resend-verification-container .card-body .links .link:hover {
+  text-decoration: underline;
+}
+
+.resend-verification-container .card-body .links .divider {
+  margin: 0 0.5rem;
+  color: #999;
+}
+
+/* Responsive design */
 @media (max-width: 576px) {
   .resend-verification-container {
     padding: 10px;
-
-    .card {
-      &-header,
-      &-body {
-        padding: 1.5rem;
-      }
-    }
+  }
+  
+  .resend-verification-container .card-header,
+  .resend-verification-container .card-body {
+    padding: 1.5rem;
   }
 }

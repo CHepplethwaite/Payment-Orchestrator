@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common'; // Add this import
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { NotificationService } from '../../../../shared/services/notification.service';
+import { AuthService } from '../../../../core/authentication/auth.service';
+import { NotificationService } from '../../../../core/services/notification/notification.service';
 
 @Component({
   selector: 'app-oauth-callback',
@@ -36,7 +37,9 @@ import { NotificationService } from '../../../../shared/services/notification.se
       </div>
     </div>
   `,
-  styleUrls: ['./oauth-callback.component.scss']
+  styleUrls: ['./oauth-callback.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule] // Add CommonModule here
 })
 export class OauthCallbackComponent implements OnInit, OnDestroy {
   processing = true;
@@ -48,7 +51,7 @@ export class OauthCallbackComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthenticationService,
+    private authService: AuthService,
     private notificationService: NotificationService
   ) {}
 
