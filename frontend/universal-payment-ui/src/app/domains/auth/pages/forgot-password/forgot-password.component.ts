@@ -3,16 +3,17 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { NotificationService } from '../../../../shared/services/notification.service';
+import { AuthService } from '../../../../core/authentication/auth.service';
+import { NotificationService } from '../../../../core/services/notification/notification.service';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  styleUrls: ['./forgot-password.component.scss'],
+  standalone: true
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
-  forgotPasswordForm: FormGroup;
+  forgotPasswordForm!: FormGroup;
   loading = false;
   emailSent = false;
   private destroy$ = new Subject<void>();
@@ -20,7 +21,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthenticationService,
+    private authService: AuthService,
     private notificationService: NotificationService
   ) {}
 
@@ -39,7 +40,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    this.authService.forgotPassword(this.f.email.value)
+    this.authService.forgotPassword(this.f['email'].value)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -55,8 +56,14 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   }
 
   private markFormGroupTouched() {
+    // Add null check and use optional chaining
+    if (!this.forgotPasswordForm) return;
+    
     Object.keys(this.forgotPasswordForm.controls).forEach(key => {
-      this.forgotPasswordForm.get(key).markAsTouched();
+      const control = this.forgotPasswordForm.get(key);
+      if (control) {
+        control.markAsTouched();
+      }
     });
   }
 

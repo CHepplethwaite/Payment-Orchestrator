@@ -9,7 +9,8 @@ import { NotificationService } from '../../../../shared/services/notification.se
 @Component({
   selector: 'app-lock-account',
   templateUrl: './lock-account.component.html',
-  styleUrls: ['./lock-account.component.scss']
+  styleUrls: ['./lock-account.component.scss'],
+  standalone: true
 })
 export class LockAccountComponent implements OnInit, OnDestroy {
   unlockForm: FormGroup;
