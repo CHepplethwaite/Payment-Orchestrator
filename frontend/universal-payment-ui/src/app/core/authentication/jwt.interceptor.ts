@@ -18,8 +18,8 @@ export class JwtInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Add auth header if user is logged in
-    const token = this.auth.getAccessToken();
+    // Use the accessToken getter property instead of getAccessToken method
+    const token = this.auth.accessToken;
     if (token && this.shouldAddToken(request)) {
       request = this.addToken(request, token);
     }
@@ -56,10 +56,11 @@ export class JwtInterceptor implements HttpInterceptor {
       this.refreshTokenSubject.next(null);
 
       return this.auth.refreshToken().pipe(
-        switchMap((token: string) => {
+        switchMap((response: any) => { // Update to handle TokenRefreshResponse
           this.isRefreshing = false;
-          this.refreshTokenSubject.next(token);
-          return next.handle(this.addToken(request, token));
+          const newToken = response.accessToken; // Extract token from response
+          this.refreshTokenSubject.next(newToken);
+          return next.handle(this.addToken(request, newToken));
         }),
         catchError(error => {
           this.isRefreshing = false;
