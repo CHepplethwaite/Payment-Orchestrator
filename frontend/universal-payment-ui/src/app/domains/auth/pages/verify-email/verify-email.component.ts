@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { NotificationService } from '../../../../shared/services/notification.service';
+import { AuthService } from '../../../../core/authentication/auth.service';
+import { NotificationService } from '../../../../core/services/notification/notification.service';
 
 @Component({
   selector: 'app-verify-email',
@@ -18,7 +18,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthenticationService,
+    private authService: AuthService,
     private notificationService: NotificationService
   ) {}
 

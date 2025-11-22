@@ -14,7 +14,7 @@ import { NotificationService } from '../../../../core/services/notification/noti
   standalone: true, // Add this if using standalone components
   imports: [CommonModule, ReactiveFormsModule] // Add necessary imports
 })
-export class TwoFactorAuthComponent implements OnInit, ngOnDestroy, AfterViewInit {
+export class TwoFactorAuthComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChildren('codeInput') codeInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
