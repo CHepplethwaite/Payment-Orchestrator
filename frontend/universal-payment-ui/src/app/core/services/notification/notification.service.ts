@@ -7,6 +7,7 @@ export interface Notification {
   title: string;
   message: string;
   duration?: number;
+  autoDismiss?: boolean;
   action?: {
     label: string;
     callback: () => void;
@@ -16,11 +17,11 @@ export interface Notification {
 
 export interface NotificationOptions {
   duration?: number;
+  autoDismiss?: boolean;
   action?: {
     label: string;
     callback: () => void;
   };
-  autoDismiss?: boolean;
 }
 
 @Injectable({
@@ -33,8 +34,8 @@ export class NotificationService {
   private notifications = signal<Notification[]>([]);
   public readonly notificationsList = this.notifications.asReadonly();
   
-  // Auto-remove notifications after their duration
-  private autoRemoveTimers = new Map<string, NodeJS.Timeout>();
+  // Auto-remove notifications after their duration - use number instead of NodeJS.Timeout
+  private autoRemoveTimers = new Map<string, number>();
 
   /**
    * Show a success notification
@@ -44,7 +45,7 @@ export class NotificationService {
       type: 'success',
       title: title || 'Success',
       message,
-      ...this.getDefaultOptions(options)
+      ...this.getDefaultOptions(options, 'success')
     });
   }
 
@@ -56,7 +57,7 @@ export class NotificationService {
       type: 'error',
       title: title || 'Error',
       message,
-      ...this.getDefaultOptions(options)
+      ...this.getDefaultOptions(options, 'error')
     });
   }
 
@@ -68,7 +69,7 @@ export class NotificationService {
       type: 'warning',
       title: title || 'Warning',
       message,
-      ...this.getDefaultOptions(options)
+      ...this.getDefaultOptions(options, 'warning')
     });
   }
 
@@ -80,7 +81,7 @@ export class NotificationService {
       type: 'info',
       title: title || 'Information',
       message,
-      ...this.getDefaultOptions(options)
+      ...this.getDefaultOptions(options, 'info')
     });
   }
 
@@ -90,6 +91,7 @@ export class NotificationService {
   showAuthSuccess(message: string, action?: string): string {
     const options: NotificationOptions = {
       duration: 5000,
+      autoDismiss: true,
       action: action ? {
         label: 'View Dashboard',
         callback: () => this.router.navigate(['/dashboard'])
@@ -126,7 +128,7 @@ export class NotificationService {
 
     return this.showError(message, title, {
       duration: 7000,
-      autoDismiss: false
+      autoDismiss: false // Don't auto-dismiss errors
     });
   }
 
@@ -136,11 +138,11 @@ export class NotificationService {
       'Session Expired',
       {
         duration: 10000,
+        autoDismiss: false,
         action: {
           label: 'Login',
           callback: () => this.router.navigate(['/auth/login'])
-        },
-        autoDismiss: false
+        }
       }
     );
   }
@@ -224,7 +226,7 @@ export class NotificationService {
       [fullNotification, ...notifications].slice(0, 5) // Keep max 5 notifications
     );
 
-    // Set up auto-dismiss if enabled
+    // Set up auto-dismiss if enabled and duration is provided
     if (notification.autoDismiss !== false && notification.duration) {
       this.setAutoRemoveTimer(id, notification.duration);
     }
@@ -236,7 +238,7 @@ export class NotificationService {
     const timer = setTimeout(() => {
       this.removeNotification(id);
       this.autoRemoveTimers.delete(id);
-    }, duration);
+    }, duration) as unknown as number;
 
     this.autoRemoveTimers.set(id, timer);
   }
@@ -253,7 +255,7 @@ export class NotificationService {
     return `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private getDefaultOptions(options?: NotificationOptions): Partial<Notification> {
+  private getDefaultOptions(options?: NotificationOptions, type?: string): Partial<Notification> {
     const defaultDuration: { [key: string]: number } = {
       success: 5000,
       error: 7000,
@@ -261,10 +263,17 @@ export class NotificationService {
       info: 4000
     };
 
+    const defaultAutoDismiss: { [key: string]: boolean } = {
+      success: true,
+      error: false, // Errors typically don't auto-dismiss
+      warning: true,
+      info: true
+    };
+
     return {
-      duration: options?.duration || defaultDuration[options?.type || 'info'],
-      action: options?.action,
-      autoDismiss: options?.autoDismiss ?? true
+      duration: options?.duration || (type ? defaultDuration[type] : 5000),
+      autoDismiss: options?.autoDismiss ?? (type ? defaultAutoDismiss[type] : true),
+      action: options?.action
     };
   }
 }
