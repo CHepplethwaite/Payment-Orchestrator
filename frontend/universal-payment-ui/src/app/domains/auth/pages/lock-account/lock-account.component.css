@@ -5,193 +5,191 @@
   min-height: 100vh;
   padding: 20px;
   background: #f5f5f5;
-
-  .card {
-    width: 100%;
-    max-width: 450px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 8px;
-
-    &-header {
-      text-align: center;
-      background: white;
-      border-bottom: 1px solid #eee;
-      padding: 2rem;
-
-      .lock-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-      }
-
-      h2 {
-        margin: 0 0 0.5rem 0;
-        color: #dc3545;
-        font-weight: 600;
-      }
-
-      .subtitle {
-        color: #666;
-        margin: 0;
-        font-size: 0.9rem;
-        line-height: 1.4;
-      }
-    }
-
-    &-body {
-      padding: 2rem;
-
-      .alert-warning {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        color: #856404;
-        border-radius: 4px;
-        padding: 0.75rem;
-        margin-bottom: 1.5rem;
-        font-size: 0.9rem;
-      }
-
-      .form-group {
-        margin-bottom: 1.5rem;
-
-        label {
-          font-weight: 500;
-          margin-bottom: 0.5rem;
-          color: #333;
-        }
-
-        .form-control {
-          padding: 0.75rem;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          transition: border-color 0.2s;
-
-          &:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-          }
-
-          &.is-invalid {
-            border-color: #dc3545;
-          }
-        }
-      }
-
-      .btn {
-        padding: 0.75rem;
-        border-radius: 4px;
-        font-weight: 500;
-        transition: all 0.2s;
-
-        &-primary {
-          background: #dc3545;
-          border: none;
-
-          &:hover:not(:disabled) {
-            background: #c82333;
-          }
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-
-      .success-message {
-        padding: 1rem 0;
-
-        .success-icon {
-          font-size: 3rem;
-          color: #28a745;
-          margin-bottom: 1rem;
-        }
-
-        h3 {
-          color: #28a745;
-          margin-bottom: 1rem;
-        }
-
-        p {
-          color: #666;
-          margin-bottom: 1.5rem;
-          line-height: 1.5;
-        }
-
-        .success-actions {
-          margin-top: 1.5rem;
-        }
-      }
-
-      .additional-options {
-        margin: 2rem 0 1.5rem 0;
-        display: grid;
-        gap: 1rem;
-
-        .option-card {
-          background: #f8f9fa;
-          border: 1px solid #e9ecef;
-          border-radius: 6px;
-          padding: 1.25rem;
-          text-align: center;
-
-          h4 {
-            margin: 0 0 0.5rem 0;
-            color: #333;
-            font-size: 1rem;
-          }
-
-          p {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-          }
-
-          .btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-          }
-        }
-      }
-
-      .links {
-        margin-top: 1.5rem;
-        font-size: 0.9rem;
-
-        .link {
-          color: #007bff;
-          text-decoration: none;
-          cursor: pointer;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-
-        .divider {
-          margin: 0 0.5rem;
-          color: #999;
-        }
-      }
-    }
-  }
 }
 
-// Responsive design
+.lock-account-container .card {
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 8px;
+}
+
+.lock-account-container .card-header {
+  text-align: center;
+  background: white;
+  border-bottom: 1px solid #eee;
+  padding: 2rem;
+}
+
+.lock-account-container .card-header .lock-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.lock-account-container .card-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.lock-account-container .card-header .subtitle {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.lock-account-container .card-body {
+  padding: 2rem;
+}
+
+.lock-account-container .card-body .alert-warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.lock-account-container .card-body .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.lock-account-container .card-body .form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.lock-account-container .card-body .form-group .form-control {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.lock-account-container .card-body .form-group .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.lock-account-container .card-body .form-group .form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.lock-account-container .card-body .btn {
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.lock-account-container .card-body .btn-primary {
+  background: #dc3545;
+  border: none;
+}
+
+.lock-account-container .card-body .btn-primary:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.lock-account-container .card-body .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lock-account-container .card-body .success-message {
+  padding: 1rem 0;
+}
+
+.lock-account-container .card-body .success-message .success-icon {
+  font-size: 3rem;
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+
+.lock-account-container .card-body .success-message h3 {
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+
+.lock-account-container .card-body .success-message p {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.lock-account-container .card-body .success-message .success-actions {
+  margin-top: 1.5rem;
+}
+
+.lock-account-container .card-body .additional-options {
+  margin: 2rem 0 1.5rem 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.lock-account-container .card-body .additional-options .option-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.lock-account-container .card-body .additional-options .option-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.lock-account-container .card-body .additional-options .option-card p {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.lock-account-container .card-body .additional-options .option-card .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.lock-account-container .card-body .links {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.lock-account-container .card-body .links .link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.lock-account-container .card-body .links .link:hover {
+  text-decoration: underline;
+}
+
+.lock-account-container .card-body .links .divider {
+  margin: 0 0.5rem;
+  color: #999;
+}
+
+/* Responsive design */
 @media (max-width: 576px) {
   .lock-account-container {
     padding: 10px;
+  }
 
-    .card {
-      &-header,
-      &-body {
-        padding: 1.5rem;
-      }
+  .lock-account-container .card-header,
+  .lock-account-container .card-body {
+    padding: 1.5rem;
+  }
 
-      .additional-options {
-        grid-template-columns: 1fr;
-      }
-    }
+  .lock-account-container .card .additional-options {
+    grid-template-columns: 1fr;
   }
 }
