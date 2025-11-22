@@ -3,6 +3,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTr
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { LoggerService } from '../services/logger.service';
+import { MockAuthService } from './mock-auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { LoggerService } from '../services/logger.service';
 export class AuthGuard implements CanActivate {
 
   constructor(
-    private auth: AuthService,
+    private auth: MockAuthService,
     private router: Router,
     private logger: LoggerService
   ) {}

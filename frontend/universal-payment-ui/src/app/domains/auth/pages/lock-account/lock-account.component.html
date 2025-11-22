@@ -3,45 +3,59 @@
     <div class="card-header">
       <div class="lock-icon">🔒</div>
       <h2>Account Locked</h2>
-      <p class="subtitle" *ngIf="isAutoLocked">
-        Your account has been temporarily locked due to multiple failed login attempts.
-      </p>
-      <p class="subtitle" *ngIf="!isAutoLocked">
-        Request an unlock link to regain access to your account.
-      </p>
+      @if (isAutoLocked) {
+        <p class="subtitle">
+          Your account has been temporarily locked due to multiple failed login attempts.
+        </p>
+      }
+      @if (!isAutoLocked) {
+        <p class="subtitle">
+          Request an unlock link to regain access to your account.
+        </p>
+      }
     </div>
 
     <div class="card-body">
-      <div class="alert alert-warning" *ngIf="isAutoLocked">
-        <strong>Security Notice:</strong> For your protection, we've locked your account after several unsuccessful login attempts.
-      </div>
-
-      <form [formGroup]="unlockForm" (ngSubmit)="onSubmit()" *ngIf="!success; else successTemplate">
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            class="form-control"
-            [class.is-invalid]="unlockForm?.get('email')?.invalid && (unlockForm?.get('email')?.touched || unlockForm?.get('email')?.dirty)"
-            placeholder="Enter your email address">
-          <div class="invalid-feedback" *ngIf="unlockForm?.get('email')?.invalid && unlockForm?.get('email')?.touched">
-            <span *ngIf="unlockForm?.get('email')?.errors?.['required']">Email is required</span>
-            <span *ngIf="unlockForm?.get('email')?.errors?.['email']">Please enter a valid email address</span>
-          </div>
+      @if (isAutoLocked) {
+        <div class="alert alert-warning">
+          <strong>Security Notice:</strong> For your protection, we've locked your account after several unsuccessful login attempts.
         </div>
+      }
 
-        <button
-          type="submit"
-          class="btn btn-primary btn-block"
-          [disabled]="loading || countdown > 0 || unlockForm?.invalid">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
-          {{ countdown > 0 ? ('Resend in ' + countdown + 's') : 'Send Unlock Instructions' }}
-        </button>
-      </form>
+      @if (!success) {
+        <form [formGroup]="unlockForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              [class.is-invalid]="unlockForm.get('email')?.invalid && (unlockForm.get('email')?.touched || unlockForm.get('email')?.dirty)"
+              placeholder="Enter your email address">
+            @if (unlockForm.get('email')?.invalid && unlockForm.get('email')?.touched) {
+              <div class="invalid-feedback">
+                @if (unlockForm.get('email')?.errors?.['required']) {
+                  <span>Email is required</span>
+                }
+                @if (unlockForm.get('email')?.errors?.['email']) {
+                  <span>Please enter a valid email address</span>
+                }
+              </div>
+            }
+          </div>
 
-      <ng-template #successTemplate>
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            [disabled]="loading || countdown > 0 || unlockForm.invalid">
+            @if (loading) {
+              <span class="spinner-border spinner-border-sm mr-2"></span>
+            }
+            {{ countdown > 0 ? ('Resend in ' + countdown + 's') : 'Send Unlock Instructions' }}
+          </button>
+        </form>
+      } @else {
         <div class="success-message text-center">
           <div class="success-icon">✓</div>
           <h3>Unlock Email Sent!</h3>
@@ -56,7 +70,7 @@
             </button>
           </div>
         </div>
-      </ng-template>
+      }
 
       <div class="additional-options">
         <div class="option-card">

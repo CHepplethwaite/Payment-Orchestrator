@@ -4,6 +4,7 @@ import { CanActivate, CanActivateChild, Router, ActivatedRouteSnapshot, RouterSt
 import { Observable } from 'rxjs';
 import { AuthService } from '../authentication/auth.service';
 import { AUTH_SERVICE } from '../tokens/auth-service.token';
+import { MockAuthService } from './mock-auth.service';
 
 export interface GuestGuardConfig {
   allowAuthenticated?: boolean;
@@ -18,7 +19,7 @@ export interface GuestGuardConfig {
 })
 export class GuestGuard implements CanActivate, CanActivateChild {
   constructor(
-    @Inject(AUTH_SERVICE) private authService: AuthService,
+    @Inject(AUTH_SERVICE) private authService: MockAuthService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
