@@ -8,15 +8,18 @@ import { LogoutComponent } from './domains/auth/pages/logout/logout.component';
 import { ResendVerificationComponent } from './domains/auth/pages/resend-verification/resend-verification.component';
 import { LockAccountComponent } from './domains/auth/pages/lock-account/lock-account.component';
 import { TwoFactorAuthComponent } from './domains/auth/pages/two-factor-auth/two-factor-auth.component';
+import { Login2faComponent } from './domains/auth/pages/login-2fa/login-2fa.component';
 import { OauthCallbackComponent } from './domains/auth/pages/oauth-callback/oauth-callback.component';
 
-import { AuthGuard } from './core/authentication/auth.guard';      // protects routes for logged-in users
-import { GuestGuard } from './core/authentication/guest.guard';    // protects routes for guests only
+import { AuthGuard } from './core/authentication/auth.guard';
+import { GuestGuard } from './core/authentication/guest.guard';
+import { LockGuard } from './core/authentication/lock.guard'; // optional guard for locked accounts
 
 export const routes: Routes = [
   {
     path: 'auth',
     children: [
+      // Guest routes
       { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
       { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
       { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
@@ -24,25 +27,31 @@ export const routes: Routes = [
       { path: 'verify-email/:token', component: VerifyEmailComponent, canActivate: [GuestGuard] },
       { path: 'resend-verification', component: ResendVerificationComponent, canActivate: [GuestGuard] },
 
-      // Optional: protect or leave public
-      { path: 'lock', component: LockAccountComponent },
+      // Locked account
+      { path: 'lock', component: LockAccountComponent, canActivate: [LockGuard] },
 
+      // 2FA routes
       { path: '2fa', component: TwoFactorAuthComponent, canActivate: [AuthGuard] },
+      { path: 'login-2fa', component: Login2faComponent, canActivate: [GuestGuard] },
 
+      // OAuth callback with provider param
       {
         path: 'oauth',
         children: [
-          { path: 'callback', component: OauthCallbackComponent, canActivate: [GuestGuard] }
+          { path: 'callback/:provider', component: OauthCallbackComponent, canActivate: [GuestGuard] }
         ]
       },
 
+      // Authenticated route
       { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
 
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },
 
+  // Default redirect
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
 
+  // Catch-all redirect
   { path: '**', redirectTo: 'auth/login', pathMatch: 'full' }
 ];

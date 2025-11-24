@@ -1,0 +1,122 @@
+<div class="login-2fa-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Two-Factor Authentication</h2>
+      <p class="subtitle">Enter the verification code from your authenticator app</p>
+    </div>
+
+    <div class="card-body">
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" 
+           class="alert" 
+           [class.alert-error]="!errorMessage.includes('resent')"
+           [class.alert-success]="errorMessage.includes('resent')">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Main 2FA Form -->
+      <form *ngIf="!showBackupCodeInput" 
+            [formGroup]="twoFactorForm" 
+            (ngSubmit)="onSubmit()" 
+            class="auth-form">
+        
+        <div class="form-group">
+          <label for="code" class="form-label">
+            Verification Code
+          </label>
+          <input
+            id="code"
+            type="text"
+            formControlName="code"
+            placeholder="Enter 6-digit code"
+            [class]="getInputClasses(code)"
+            maxlength="6"
+            autocomplete="one-time-code"
+            inputmode="numeric"
+            autofocus>
+          
+          <div class="validation-errors">
+            <span *ngIf="code?.errors?.['required'] && (code?.dirty || code?.touched)" class="error-text">
+              Verification code is required
+            </span>
+            <span *ngIf="code?.errors?.['minlength'] && (code?.dirty || code?.touched)" class="error-text">
+              Code must be 6 digits
+            </span>
+            <span *ngIf="code?.errors?.['pattern'] && (code?.dirty || code?.touched)" class="error-text">
+              Code must contain only numbers
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="rememberDevice">
+            <span class="checkmark"></span>
+            Remember this device for 30 days
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          [disabled]="twoFactorForm.invalid || isLoading">
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Verifying...' : 'Verify' }}
+        </button>
+      </form>
+
+      <!-- Backup Code Form -->
+      <div *ngIf="showBackupCodeInput" class="backup-code-form">
+        <div class="form-group">
+          <label for="backupCode" class="form-label">
+            Backup Code
+          </label>
+          <input
+            id="backupCode"
+            type="text"
+            #backupCodeInput
+            placeholder="Enter backup code"
+            class="form-input"
+            autocomplete="one-time-code">
+          <p class="help-text">
+            Use one of your 8-digit backup codes
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary btn-block"
+          [disabled]="isLoading"
+          (click)="onBackupCodeSubmit(backupCodeInput.value)">
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Verifying...' : 'Verify Backup Code' }}
+        </button>
+      </div>
+
+      <!-- Action Links -->
+      <div class="action-links">
+        <button
+          type="button"
+          class="btn-link"
+          (click)="resendCode()"
+          [disabled]="isResendingCode">
+          {{ isResendingCode ? 'Sending...' : "Didn't receive a code?" }}
+        </button>
+
+        <button
+          type="button"
+          class="btn-link"
+          (click)="toggleBackupCodeInput()">
+          {{ showBackupCodeInput ? 'Use Authenticator App' : 'Use Backup Code' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn-link text-muted"
+          (click)="onBackToLogin()">
+          Back to Login
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
