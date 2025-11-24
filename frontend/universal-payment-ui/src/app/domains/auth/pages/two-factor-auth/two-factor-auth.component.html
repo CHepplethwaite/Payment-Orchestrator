@@ -7,160 +7,183 @@
 
     <div class="card-body">
       <!-- Status Messages -->
-      <div *ngIf="errorMessage" class="alert alert-error">
-        {{ errorMessage }}
-      </div>
+      @if (errorMessage) {
+        <div class="alert alert-error">
+          {{ errorMessage }}
+        </div>
+      }
 
-      <div *ngIf="successMessage" class="alert alert-success">
-        {{ successMessage }}
-      </div>
+      @if (successMessage) {
+        <div class="alert alert-success">
+          {{ successMessage }}
+        </div>
+      }
 
       <!-- 2FA Not Set Up -->
-      <div *ngIf="!authService.currentUserValue?.twoFactorEnabled && !showSetupForm && !showRecoveryCodes" 
-           class="setup-prompt">
-        <div class="status-card">
-          <div class="status-icon disabled">
-            <i>🔓</i>
+      @if (!twoFactorEnabled && !showSetupForm && !showRecoveryCodes) {
+        <div class="setup-prompt">
+          <div class="status-card">
+            <div class="status-icon disabled">
+              <i>🔓</i>
+            </div>
+            <h3>Two-Factor Authentication is Disabled</h3>
+            <p>Protect your account by enabling two-factor authentication. You'll need to verify your identity using an authenticator app when signing in.</p>
+            <button type="button" class="btn btn-primary" (click)="startSetup()">
+              Enable Two-Factor Auth
+            </button>
           </div>
-          <h3>Two-Factor Authentication is Disabled</h3>
-          <p>Protect your account by enabling two-factor authentication. You'll need to verify your identity using an authenticator app when signing in.</p>
-          <button type="button" class="btn btn-primary" (click)="startSetup()">
-            Enable Two-Factor Auth
-          </button>
         </div>
-      </div>
+      }
 
       <!-- 2FA Set Up Flow -->
-      <div *ngIf="showSetupForm && !showRecoveryCodes" class="setup-flow">
-        <div class="qr-section">
-          <h3>Set Up Authenticator App</h3>
-          <p>Scan this QR code with your authenticator app:</p>
-          
-          <div class="qr-code-container">
-            <img [src]="qrCodeUrl" alt="QR Code" class="qr-code">
-          </div>
-
-          <div class="manual-setup">
-            <p><strong>Can't scan the code?</strong> Enter this secret key manually:</p>
-            <div class="secret-key">
-              <code>{{ secret }}</code>
-              <button type="button" class="btn-copy" (click)="copySecret()">Copy</button>
-            </div>
-          </div>
-        </div>
-
-        <form [formGroup]="setupForm" (ngSubmit)="enableTwoFactor()" class="verification-form">
-          <div class="form-group">
-            <label for="setupCode" class="form-label">Verification Code</label>
-            <input
-              id="setupCode"
-              type="text"
-              formControlName="verificationCode"
-              placeholder="Enter 6-digit code"
-              maxlength="6"
-              autocomplete="one-time-code"
-              inputmode="numeric">
+      @if (showSetupForm && !showRecoveryCodes) {
+        <div class="setup-flow">
+          <div class="qr-section">
+            <h3>Set Up Authenticator App</h3>
+            <p>Scan this QR code with your authenticator app:</p>
             
-            <div class="validation-errors">
-              <span *ngIf="setupVerificationCode?.errors?.['required'] && (setupVerificationCode?.dirty || setupVerificationCode?.touched)" 
-                    class="error-text">
-                Verification code is required
-              </span>
-              <span *ngIf="setupVerificationCode?.errors?.['minlength'] && (setupVerificationCode?.dirty || setupVerificationCode?.touched)" 
-                    class="error-text">
-                Code must be 6 digits
-              </span>
-              <span *ngIf="setupVerificationCode?.errors?.['pattern'] && (setupVerificationCode?.dirty || setupVerificationCode?.touched)" 
-                    class="error-text">
-                Code must contain only numbers
-              </span>
+            <div class="qr-code-container">
+              <img [src]="qrCodeUrl" alt="QR Code" class="qr-code">
             </div>
-          </div>
 
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" (click)="cancelSetup()">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="setupForm.invalid || isLoading">
-              <span *ngIf="isLoading" class="spinner"></span>
-              {{ isLoading ? 'Enabling...' : 'Enable' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Recovery Codes -->
-      <div *ngIf="showRecoveryCodes" class="recovery-codes">
-        <div class="warning-card">
-          <h3>🔐 Save Your Recovery Codes</h3>
-          <p><strong>Important:</strong> Save these recovery codes in a safe place. You can use them to access your account if you lose your authenticator device.</p>
-          
-          <div class="codes-container">
-            <div class="codes-list">
-              <div *ngFor="let code of recoveryCodes; let i = index" class="code-item">
-                <span class="code-number">{{ i + 1 }}.</span>
-                <code>{{ code }}</code>
+            <div class="manual-setup">
+              <p><strong>Can't scan the code?</strong> Enter this secret key manually:</p>
+              <div class="secret-key">
+                <code>{{ secret }}</code>
+                <button type="button" class="btn-copy" (click)="copySecret()">Copy</button>
               </div>
             </div>
           </div>
 
-          <div class="recovery-actions">
-            <button type="button" class="btn btn-secondary" (click)="copyRecoveryCodes()">
-              Copy Codes
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="downloadRecoveryCodes()">
-              Download Codes
-            </button>
-            <button type="button" class="btn btn-primary" (click)="cancelSetup()">
-              I've Saved My Codes
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2FA Enabled - Management -->
-      <div *ngIf="authService.currentUserValue?.twoFactorEnabled && !showSetupForm && !showRecoveryCodes" 
-           class="management-section">
-        <div class="status-card">
-          <div class="status-icon enabled">
-            <i>🔒</i>
-          </div>
-          <h3>Two-Factor Authentication is Enabled</h3>
-          <p>Your account is protected with two-factor authentication. You'll need to enter a verification code from your authenticator app when signing in.</p>
-
-          <form [formGroup]="disableForm" (ngSubmit)="disableTwoFactor()" class="disable-form">
+          <form [formGroup]="setupForm" (ngSubmit)="enableTwoFactor()" class="verification-form">
             <div class="form-group">
-              <label for="disableCode" class="form-label">Enter verification code to disable 2FA</label>
+              <label for="setupCode" class="form-label">Verification Code</label>
               <input
-                id="disableCode"
+                id="setupCode"
                 type="text"
                 formControlName="verificationCode"
                 placeholder="Enter 6-digit code"
                 maxlength="6"
                 autocomplete="one-time-code"
-                inputmode="numeric">
+                inputmode="numeric"
+                class="form-input">
               
               <div class="validation-errors">
-                <span *ngIf="disableVerificationCode?.errors?.['required'] && (disableVerificationCode?.dirty || disableVerificationCode?.touched)" 
-                      class="error-text">
-                  Verification code is required
-                </span>
-                <span *ngIf="disableVerificationCode?.errors?.['minlength'] && (disableVerificationCode?.dirty || disableVerificationCode?.touched)" 
-                      class="error-text">
-                  Code must be 6 digits
-                </span>
+                @if (setupVerificationCode?.errors?.['required'] && (setupVerificationCode?.dirty || setupVerificationCode?.touched)) {
+                  <span class="error-text">
+                    Verification code is required
+                  </span>
+                }
+                @if (setupVerificationCode?.errors?.['minlength'] && (setupVerificationCode?.dirty || setupVerificationCode?.touched)) {
+                  <span class="error-text">
+                    Code must be 6 digits
+                  </span>
+                }
+                @if (setupVerificationCode?.errors?.['pattern'] && (setupVerificationCode?.dirty || setupVerificationCode?.touched)) {
+                  <span class="error-text">
+                    Code must contain only numbers
+                  </span>
+                }
               </div>
             </div>
 
             <div class="form-actions">
-              <button type="submit" class="btn btn-danger" [disabled]="disableForm.invalid || isLoading">
-                <span *ngIf="isLoading" class="spinner"></span>
-                {{ isLoading ? 'Disabling...' : 'Disable Two-Factor Auth' }}
+              <button type="button" class="btn btn-secondary" (click)="cancelSetup()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="setupForm.invalid || isLoading">
+                @if (isLoading) {
+                  <span class="spinner"></span>
+                }
+                {{ isLoading ? 'Enabling...' : 'Enable' }}
               </button>
             </div>
           </form>
         </div>
-      </div>
+      }
+
+      <!-- Recovery Codes -->
+      @if (showRecoveryCodes) {
+        <div class="recovery-codes">
+          <div class="warning-card">
+            <h3>🔐 Save Your Recovery Codes</h3>
+            <p><strong>Important:</strong> Save these recovery codes in a safe place. You can use them to access your account if you lose your authenticator device.</p>
+            
+            <div class="codes-container">
+              <div class="codes-list">
+                @for (code of recoveryCodes; track code; let i = $index) {
+                  <div class="code-item">
+                    <span class="code-number">{{ i + 1 }}.</span>
+                    <code>{{ code }}</code>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="recovery-actions">
+              <button type="button" class="btn btn-secondary" (click)="copyRecoveryCodes()">
+                Copy Codes
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="downloadRecoveryCodes()">
+                Download Codes
+              </button>
+              <button type="button" class="btn btn-primary" (click)="cancelSetup()">
+                I've Saved My Codes
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- 2FA Enabled - Management -->
+      @if (twoFactorEnabled && !showSetupForm && !showRecoveryCodes) {
+        <div class="management-section">
+          <div class="status-card">
+            <div class="status-icon enabled">
+              <i>🔒</i>
+            </div>
+            <h3>Two-Factor Authentication is Enabled</h3>
+            <p>Your account is protected with two-factor authentication. You'll need to enter a verification code from your authenticator app when signing in.</p>
+
+            <form [formGroup]="disableForm" (ngSubmit)="disableTwoFactor()" class="disable-form">
+              <div class="form-group">
+                <label for="disableCode" class="form-label">Enter verification code to disable 2FA</label>
+                <input
+                  id="disableCode"
+                  type="text"
+                  formControlName="verificationCode"
+                  placeholder="Enter 6-digit code"
+                  maxlength="6"
+                  autocomplete="one-time-code"
+                  inputmode="numeric"
+                  class="form-input">
+                
+                <div class="validation-errors">
+                  @if (disableVerificationCode?.errors?.['required'] && (disableVerificationCode?.dirty || disableVerificationCode?.touched)) {
+                    <span class="error-text">
+                      Verification code is required
+                    </span>
+                  }
+                  @if (disableVerificationCode?.errors?.['minlength'] && (disableVerificationCode?.dirty || disableVerificationCode?.touched)) {
+                    <span class="error-text">
+                      Code must be 6 digits
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-danger" [disabled]="disableForm.invalid || isLoading">
+                  @if (isLoading) {
+                    <span class="spinner"></span>
+                  }
+                  {{ isLoading ? 'Disabling...' : 'Disable Two-Factor Auth' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
 
       <!-- Navigation -->
       <div class="navigation">

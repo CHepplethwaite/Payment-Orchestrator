@@ -32,7 +32,7 @@ export class TwoFactorAuthComponent implements OnInit, OnDestroy {
 
   constructor(
     private formBuilder: FormBuilder,
-    public authService: AuthService, // Changed to public for template access
+    public authService: AuthService,
     private router: Router
   ) {
     this.setupForm = this.createSetupForm();
@@ -173,11 +173,9 @@ export class TwoFactorAuthComponent implements OnInit, OnDestroy {
     this.successMessage = '';
   }
 
-  // Add the missing copySecret method
   copySecret(): void {
     navigator.clipboard.writeText(this.secret).then(() => {
       this.successMessage = 'Secret key copied to clipboard!';
-      // Clear success message after 3 seconds
       setTimeout(() => {
         if (this.successMessage === 'Secret key copied to clipboard!') {
           this.successMessage = '';
