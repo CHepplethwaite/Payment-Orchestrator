@@ -150,12 +150,6 @@ This makes adding a new bank:
 
 ---
 
-## 📜 License
-
-To be added.
-
----
-
 ## 🤝 Contributions
 
 Contributions are welcome via feature requests, bank adapter additions, or performance improvements.
