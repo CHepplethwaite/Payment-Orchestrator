@@ -1,22 +1,22 @@
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using universal_payment_platform.Infrastructure.PipelineBehaviors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Reflection;
 using System.Text;
 using universal_payment_platform.Data.Entities;
+using universal_payment_platform.Infrastructure.PipelineBehaviors;
 using universal_payment_platform.Infrastructure.Security;
 using universal_payment_platform.Middleware;
 using universal_payment_platform.Repositories.Implementations;
 using universal_payment_platform.Repositories.Interfaces;
-using universal_payment_platform.Services.Adapters;
+using universal_payment_platform.Services.Adapters.Airtel;
+using universal_payment_platform.Services.Adapters.MTN;
 using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Validators;
 using UniversalPaymentPlatform.Infrastructure.Logging;
-using MediatR;
-using FluentValidation;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +24,14 @@ var builder = WebApplication.CreateBuilder(args);
 LoggerConfig.ConfigureSerilog(builder.Configuration);
 builder.Host.UseSerilog();
 
-// Configure PostgreSQL + Identity
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ========= DATABASE =========
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+
+// ========= IDENTITY =========
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -39,10 +43,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configure JWT Authentication
+
+// ========= JWT =========
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]
-    ?? throw new InvalidOperationException("Missing JWT Key in configuration"));
+    ?? throw new InvalidOperationException("Missing JWT Key in appsettings.json"));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -51,49 +56,73 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+
+        ClockSkew = TimeSpan.Zero // 🔥 no 5-minute delay
     };
 });
 
-// Register JwtTokenProvider
 builder.Services.AddSingleton<JwtTokenProvider>();
 
-// Add controllers without automatic FluentValidation integration
-builder.Services.AddControllers();
 
-// Register all validators from the assembly
+// ========= CORS =========
+// Allow Angular dev + prod
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+        policy
+            .WithOrigins(
+                "http://localhost:4200",
+                "https://yourproductiondomain.com"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+    );
+});
+
+
+// ========= CONTROLLERS / VALIDATION =========
+builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<PaymentRequestValidator>();
 
-// --- MediatR setup ---
-// Registers all IRequestHandler<,> in this assembly
+
+// ========= MEDIATR =========
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
-// Repositories
+
+// ========= REPOSITORIES =========
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
-// HTTP clients for adapters
-builder.Services.AddHttpClient<AirtelAdapter>();
-builder.Services.AddHttpClient<MTNAdapter>();
 
-// Register adapters as IPaymentAdapter implementations
-builder.Services.AddScoped<IPaymentAdapter, AirtelAdapter>();
-builder.Services.AddScoped<IPaymentAdapter, MTNAdapter>();
+// ========= ADAPTERS =========
+builder.Services.AddHttpClient<AirtelPaymentsAdapter>();
+builder.Services.AddHttpClient<MTNPaymentsAdapter>();
+
+builder.Services.AddScoped<IPaymentAdapter, AirtelPaymentsAdapter>();
+builder.Services.AddScoped<IPaymentAdapter, MTNPaymentsAdapter>();
+
 
 var app = builder.Build();
 
-// Apply database migrations automatically
+
+// ========= DATABASE MIGRATION & SEEDING =========
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -106,11 +135,14 @@ using (var scope = app.Services.CreateScope())
     await SeedData.InitializeSuperAdmin(userManager, roleManager);
 }
 
-// Global middlewares
+
+// ========= MIDDLEWARE =========
+// Custom exception before anything
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-// Secure HTTP headers
+
+// ========= SECURITY HEADERS =========
 app.Use(async (context, next) =>
 {
     var headers = context.Response.Headers;
@@ -123,26 +155,33 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// HTTPS redirection if configured
+
+// ========= HTTPS (optional) =========
 var httpsUrl = builder.Configuration["urls"]?.Split(';').FirstOrDefault(u => u.StartsWith("https://"));
 if (!string.IsNullOrEmpty(httpsUrl))
 {
     app.UseHttpsRedirection();
 }
 
-// Authentication & Authorization
+
+// ========= CORS → AUTH → AUTHZ =========
+// HIGHLY IMPORTANT ORDER
+app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map controllers
+
+// ========= ROUTES =========
 app.MapControllers();
 
-// Health check
-app.MapGet("/", () => Results.Ok(new
+app.MapGet("/", () =>
 {
-    status = "ok",
-    environment = app.Environment.EnvironmentName,
-    service = "Universal Payment Platform API"
-}));
+    return Results.Ok(new
+    {
+        status = "ok",
+        environment = app.Environment.EnvironmentName,
+        service = "Universal Payment Platform API"
+    });
+});
 
 app.Run();

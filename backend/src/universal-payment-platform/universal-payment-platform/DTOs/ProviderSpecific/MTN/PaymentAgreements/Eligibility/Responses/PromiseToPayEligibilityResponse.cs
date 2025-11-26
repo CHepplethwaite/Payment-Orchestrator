@@ -16,3 +16,4 @@ namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.PaymentAgreements
         [JsonPropertyName("data")]
         public PromiseToPayEligibilityDataDto? Data { get; init; }  // Eligibility details
     }
+}

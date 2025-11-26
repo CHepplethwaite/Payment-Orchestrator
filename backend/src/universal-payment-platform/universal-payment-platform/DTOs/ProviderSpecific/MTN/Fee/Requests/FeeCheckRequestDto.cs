@@ -72,3 +72,4 @@ namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.FeeCheck
         [JsonPropertyName("segment")]
         public Segment Segment { get; init; }
     }
+}
