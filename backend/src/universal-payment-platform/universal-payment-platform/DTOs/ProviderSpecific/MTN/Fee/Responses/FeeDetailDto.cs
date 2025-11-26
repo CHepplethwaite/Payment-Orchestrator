@@ -1,16 +1,20 @@
 ﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
-public record FeeDetailDto
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Fee.Responses
 {
-    [JsonPropertyName("feeType")]
-    public string FeeType { get; init; }
+    public record FeeDetailDto
+    {
+        [JsonPropertyName("feeType")]
+        public string? FeeType { get; init; }
 
-    [JsonPropertyName("amount")]
-    public MonetaryDto Amount { get; init; }
+        [JsonPropertyName("amount")]
+        public MonetaryTypeDto? Amount { get; init; }
 
-    [JsonPropertyName("description")]
-    public string Description { get; init; }
+        [JsonPropertyName("description")]
+        public string? Description { get; init; }
 
-    [JsonPropertyName("recipient")]
-    public string Recipient { get; init; }
+        [JsonPropertyName("recipient")]
+        public string? Recipient { get; init; }
+    }
 }

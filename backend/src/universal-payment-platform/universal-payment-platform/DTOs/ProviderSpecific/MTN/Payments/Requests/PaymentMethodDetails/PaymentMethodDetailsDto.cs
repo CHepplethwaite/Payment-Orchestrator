@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using universal_payment_platform.DTOs.ProviderSpecific.MTN.Payments.Requests.PaymentMethodDetails;
 
 namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.Payments.Requests.PaymentMethodDetails
 {

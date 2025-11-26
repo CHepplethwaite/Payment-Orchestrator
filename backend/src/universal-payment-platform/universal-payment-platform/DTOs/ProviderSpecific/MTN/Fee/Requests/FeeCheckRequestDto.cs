@@ -2,7 +2,7 @@
 using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared.Enums;
 
-namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.FeeCheck
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Fee.Requests
 {
     public record FeeCheckRequestDto
     {

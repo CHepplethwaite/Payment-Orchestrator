@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace universal_payment_platform.StateMachine.Core
+﻿namespace universal_payment_platform.StateMachine.Core
 {
     /// <summary>
     /// Base interface for all states in the state machine
@@ -17,10 +13,10 @@ namespace universal_payment_platform.StateMachine.Core
         IState<TContext> ParentState { get; }
         IReadOnlyCollection<IState<TContext>> SubStates { get; }
 
-        Task<bool> CanEnterAsync(TContext context, IDictionary<string, object> parameters = null);
-        Task<bool> CanExitAsync(TContext context, IDictionary<string, object> parameters = null);
-        Task OnEnterAsync(TContext context, IDictionary<string, object> parameters = null);
-        Task OnExitAsync(TContext context, IDictionary<string, object> parameters = null);
+        Task<bool> CanEnterAsync(TContext context, IDictionary<string, object>? parameters = null);
+        Task<bool> CanExitAsync(TContext context, IDictionary<string, object>? parameters = null);
+        Task OnEnterAsync(TContext context, IDictionary<string, object>? parameters = null);
+        Task OnExitAsync(TContext context, IDictionary<string, object>? parameters = null);
         Task OnExecuteAsync(TContext context);
 
         void AddSubState(IState<TContext> subState);

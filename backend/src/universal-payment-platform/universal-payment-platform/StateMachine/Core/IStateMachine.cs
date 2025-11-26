@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace universal_payment_platform.StateMachine.Core
+﻿namespace universal_payment_platform.StateMachine.Core
 {
     /// <summary>
     /// Main state machine interface with comprehensive functionality
@@ -28,9 +24,9 @@ namespace universal_payment_platform.StateMachine.Core
         event EventHandler<TransitionEventArgs<TContext>> TransitionExecuted;
         event EventHandler<StateMachineErrorEventArgs<TContext>> ErrorOccurred;
 
-        Task<bool> InitializeAsync(TContext context, string initialStateName = null);
-        Task<TransitionResult> TransitionToAsync(string stateName, IDictionary<string, object> parameters = null);
-        Task<bool> CanTransitionToAsync(string stateName, IDictionary<string, object> parameters = null);
+        Task<bool> InitializeAsync(TContext context, string? initialStateName = null);
+        Task<TransitionResult> TransitionToAsync(string stateName, IDictionary<string, object>? parameters = null);
+        Task<bool> CanTransitionToAsync(string stateName, IDictionary<string, object>? parameters = null);
 
         void AddState(IState<TContext> state);
         void AddTransition(ITransition<TContext> transition);
@@ -41,7 +37,7 @@ namespace universal_payment_platform.StateMachine.Core
         bool IsInState(IState<TContext> state);
         IState<TContext> FindState(string stateName);
 
-        Task<bool> FireEventAsync(string eventName, IDictionary<string, object> parameters = null);
+        Task<bool> FireEventAsync(string eventName, IDictionary<string, object>? parameters = null);
 
         // Hierarchical state machine support
         IStateMachine<TContext> GetSubMachine(string stateName);
@@ -67,8 +63,8 @@ namespace universal_payment_platform.StateMachine.Core
         string TriggerEvent { get; }
         int Priority { get; }
 
-        Task<bool> CanExecuteAsync(TContext context, IDictionary<string, object> parameters = null);
-        Task<TransitionResult> ExecuteAsync(TContext context, IDictionary<string, object> parameters = null);
+        Task<bool> CanExecuteAsync(TContext context, IDictionary<string, object>? parameters = null);
+        Task<TransitionResult> ExecuteAsync(TContext context, IDictionary<string, object>? parameters = null);
         Task<bool> ValidateAsync(TContext context);
     }
 
@@ -136,21 +132,21 @@ namespace universal_payment_platform.StateMachine.Core
     public class TransitionResult
     {
         public bool IsSuccessful { get; set; }
-        public string ErrorMessage { get; set; }
-        public Exception Exception { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
+        public Exception? Exception { get; set; }
         public TimeSpan Duration { get; set; }
-        public IDictionary<string, object> AdditionalData { get; set; }
+        public IDictionary<string, object> AdditionalData { get; set; } = new Dictionary<string, object>();
 
         public static TransitionResult Success() => new TransitionResult { IsSuccessful = true };
-        public static TransitionResult Failure(string error, Exception ex = null) =>
-            new TransitionResult { IsSuccessful = false, ErrorMessage = error, Exception = ex };
+        public static TransitionResult Failure(string error, Exception? ex = null) =>
+            new TransitionResult { IsSuccessful = false, ErrorMessage = error ?? string.Empty, Exception = ex };
     }
 
     public class StateMachineValidationResult
     {
         public bool IsValid { get; set; }
-        public IReadOnlyCollection<string> Errors { get; set; }
-        public IReadOnlyCollection<string> Warnings { get; set; }
+        public IReadOnlyCollection<string>? Errors { get; set; }
+        public IReadOnlyCollection<string>? Warnings { get; set; }
 
         public static StateMachineValidationResult Valid() =>
             new StateMachineValidationResult { IsValid = true, Errors = Array.Empty<string>(), Warnings = Array.Empty<string>() };
@@ -162,19 +158,19 @@ namespace universal_payment_platform.StateMachine.Core
     // Snapshot for persistence
     public class StateMachineSnapshot<TContext> where TContext : class
     {
-        public string MachineId { get; set; }
-        public string CurrentStateName { get; set; }
-        public string PreviousStateName { get; set; }
+        public string? MachineId { get; set; }
+        public string? CurrentStateName { get; set; }
+        public string? PreviousStateName { get; set; }
         public DateTime SnapshotTime { get; set; }
-        public IDictionary<string, object> ContextData { get; set; }
-        public IReadOnlyCollection<StateHistoryRecord> History { get; set; }
-        public string Version { get; set; }
+        public IDictionary<string, object>? ContextData { get; set; }
+        public IReadOnlyCollection<StateHistoryRecord>? History { get; set; }
+        public string? Version { get; set; }
     }
 
     public class StateHistoryRecord
     {
-        public string FromState { get; set; }
-        public string ToState { get; set; }
+        public string? FromState { get; set; }
+        public string? ToState { get; set; }
         public DateTime TransitionTime { get; set; }
         public bool WasSuccessful { get; set; }
     }

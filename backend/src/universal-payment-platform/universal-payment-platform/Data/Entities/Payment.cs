@@ -1,49 +1,38 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using universal_payment_platform.Common;
+﻿using universal_payment_platform.Common;
 
 namespace universal_payment_platform.Data.Entities
 {
     public class Payment
     {
-        [Key]
-        public Guid Id { get; set; } = Guid.NewGuid(); // Unique payment ID
+        public Guid Id { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string ExternalTransactionId { get; set; } = null!; // External transaction reference
+        // Enum backed status
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 
-        [MaxLength(100)]
-        public string? ProviderTransactionId { get; set; } // Optional provider transaction ID
-
-        [Required]
-        [MaxLength(50)]
-        public string Provider { get; set; } = null!; // e.g., "AirtelMoney", "MTNMoney"
-
-        [Required]
-        public decimal Amount { get; set; }
-
-        [Required]
-        [MaxLength(20)]
-        public string Status { get; set; } = PaymentStatus.Pending.ToString(); // Initial status
-
-        [Required]
-        [MaxLength(10)]
-        public string Currency { get; set; } = "ZMW"; // Currency code
-
-        public string? Message { get; set; } // Optional payment message or error
-
-        [Required]
+        // Audit and timestamps
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CompletedAt { get; set; }
 
-        public DateTime? UpdatedAt { get; set; }
+        // Provider transaction reference
+        public string? TransactionId { get; set; }
 
-        // Foreign key for the user who made the payment
-        [Required]
-        public string UserId { get; set; } = null!;
+        // How much hit the provider actually charges/settles
+        public decimal? SettlementAmount { get; set; }
 
-        [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; } = null!;
+        // Who initiated it
+        public string UserId { get; set; }
+
+        // Domain audit trail (optional)
+        public List<PaymentAudit> AuditTrail { get; set; } = new();
+
+        public void AddAuditTrail(string message)
+        {
+            AuditTrail.Add(new PaymentAudit
+            {
+                PaymentId = this.Id,
+                Message = message,
+                Timestamp = DateTime.UtcNow
+            });
+        }
     }
 }

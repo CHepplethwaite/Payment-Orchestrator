@@ -1,8 +1,8 @@
-﻿// File: CQRS/Commands/PaymentRequestCommand.cs
-
-using MediatR;
+﻿using MediatR;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation; // Required for [ValidateNever]
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using universal_payment_platform.DTOs.@public;
+
 
 namespace universal_payment_platform.CQRS.Commands
 {

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
 namespace Application.DTOs.Payments.Responses
 {
@@ -14,7 +15,7 @@ namespace Application.DTOs.Payments.Responses
         public DateTime? RecordDate { get; init; }
 
         [JsonPropertyName("amount")]
-        public MoneyDto? Amount { get; init; }
+        public MonetaryTypeDto? Amount { get; init; }
 
         [JsonPropertyName("status")]
         public string? Status { get; init; }

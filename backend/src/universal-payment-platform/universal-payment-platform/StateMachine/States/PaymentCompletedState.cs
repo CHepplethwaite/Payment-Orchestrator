@@ -1,53 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using universal_payment_platform.Common;
+﻿using universal_payment_platform.Common;
 using universal_payment_platform.Data.Entities;
-using universal_payment_platform.StateMachine.Core;
 
 namespace universal_payment_platform.StateMachine.States
 {
     public class PaymentCompletedState : StateBase<Payment>
     {
-        public PaymentCompletedState() : base("Completed", "Payment has been successfully completed")
+        public PaymentCompletedState()
+            : base("Completed", "Payment has been successfully completed")
         {
             IsFinal = true;
         }
 
-        protected override async Task<bool> OnCanEnterAsync(Payment context, IDictionary<string, object> parameters)
+        protected override Task<bool> OnCanEnterAsync(
+            Payment context,
+            IDictionary<string, object>? parameters = null)
         {
-            // Can enter completed state from processing state with successful result
-            return context.Status == PaymentStatus.Processing &&
-                   parameters?.ContainsKey("Success") == true &&
-                   (bool)parameters["Success"] == true;
+            if (parameters == null)
+                return Task.FromResult(false);
+
+            var success = parameters.TryGetValue("Success", out var successObj) &&
+                          successObj is bool flag &&
+                          flag;
+
+            var validPreviousState =
+                context.Status == PaymentStatus.Processing ||
+                context.Status == PaymentStatus.Authorized ||
+                context.Status == PaymentStatus.Pending;
+
+            return Task.FromResult(success && validPreviousState);
         }
 
-        protected override async Task OnEnterStateAsync(Payment context, IDictionary<string, object> parameters)
+        protected override Task OnEnterStateAsync(
+            Payment context,
+            IDictionary<string, object>? parameters = null)
         {
             context.Status = PaymentStatus.Completed;
             context.CompletedAt = DateTime.UtcNow;
-            context.TransactionId = parameters?["TransactionId"] as string;
 
-            // Update settlement information
-            if (parameters?.ContainsKey("SettlementAmount") == true)
-            {
-                context.SettlementAmount = Convert.ToDecimal(parameters["SettlementAmount"]);
-            }
+            if (parameters?.TryGetValue("TransactionId", out var tx) == true)
+                context.TransactionId = tx as string;
 
-            // Log state entry
+            if (parameters?.TryGetValue("SettlementAmount", out var amt) == true)
+                context.SettlementAmount = Convert.ToDecimal(amt);
+
             context.AddAuditTrail($"Entered {Name} state");
 
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
-        protected override async Task OnExecuteStateAsync(Payment context)
+        protected override Task OnExecuteStateAsync(Payment context)
         {
-            // Execute completion tasks
-            // Trigger webhooks
-            // Update reporting
-            // Handle post-payment actions
+            // webhook notifications
+            // settlement updates
+            // reporting
+            // async post-processing
 
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

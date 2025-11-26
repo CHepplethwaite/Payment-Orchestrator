@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
 public record PartyDto
 {
@@ -30,35 +31,35 @@ public record PartyDto
     public string Note { get; init; }
 
     [JsonPropertyName("amount")]
-    public MonetaryDto Amount { get; init; }
+    public MonetaryTypeDto Amount { get; init; }
 
     [JsonPropertyName("fee")]
-    public MonetaryDto Fee { get; init; }
+    public MonetaryTypeDto Fee { get; init; }
 
     [JsonPropertyName("externalFee")]
-    public MonetaryDto ExternalFee { get; init; }
+    public MonetaryTypeDto? ExternalFee { get; init; }
 
     [JsonPropertyName("discount")]
-    public MonetaryDto Discount { get; init; }
+    public MonetaryTypeDto? Discount { get; init; }
 
     [JsonPropertyName("promotion")]
-    public MonetaryDto Promotion { get; init; }
+    public MonetaryTypeDto? Promotion { get; init; }
 
     [JsonPropertyName("loyaltyFee")]
-    public MonetaryDto LoyaltyFee { get; init; }
+    public MonetaryTypeDto? LoyaltyFee { get; init; }
 
     [JsonPropertyName("loyaltyReward")]
-    public MonetaryDto LoyaltyReward { get; init; }
+    public MonetaryTypeDto? LoyaltyReward { get; init; }
 
     [JsonPropertyName("promotionRefund")]
-    public MonetaryDto PromotionRefund { get; init; }
+    public MonetaryTypeDto? PromotionRefund { get; init; }
 
     [JsonPropertyName("availableBalance")]
-    public MonetaryDto AvailableBalance { get; init; }
+    public MonetaryTypeDto? AvailableBalance { get; init; }
 
     [JsonPropertyName("totalBalance")]
-    public MonetaryDto TotalBalance { get; init; }
+    public MonetaryTypeDto? TotalBalance { get; init; }
 
     [JsonPropertyName("committedBalance")]
-    public MonetaryDto CommittedBalance { get; init; }
+    public MonetaryTypeDto? CommittedBalance { get; init; }
 }

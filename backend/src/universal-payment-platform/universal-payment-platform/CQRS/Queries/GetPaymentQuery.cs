@@ -1,5 +1,5 @@
 ﻿using MediatR;
-
+using universal_payment_platform.DTOs.@public;
 
 namespace universal_payment_platform.CQRS.Queries
 {

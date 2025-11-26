@@ -1,17 +1,22 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Fee.Responses;
-using System.Text.Json.Serialization;
+﻿
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.FeeCheck;
 
-public record FeeCheckResponseDto
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.Fee.Responses
 {
-    [JsonPropertyName("statusCode")]
-    public string StatusCode { get; init; }
+    using System.Text.Json.Serialization;
 
-    [JsonPropertyName("error")]
-    public string Error { get; init; }
+    public record FeeCheckResponseDto
+    {
+        [JsonPropertyName("statusCode")]
+        public string? StatusCode { get; init; }
 
-    [JsonPropertyName("sequenceNo")]
-    public string SequenceNo { get; init; }
+        [JsonPropertyName("error")]
+        public string? Error { get; init; }
 
-    [JsonPropertyName("data")]
-    public FeeCheckDataDto Data { get; init; }
+        [JsonPropertyName("sequenceNo")]
+        public string? SequenceNo { get; init; }
+
+        [JsonPropertyName("data")]
+        public FeeCheckDataDto? Data { get; init; }
+    }
 }

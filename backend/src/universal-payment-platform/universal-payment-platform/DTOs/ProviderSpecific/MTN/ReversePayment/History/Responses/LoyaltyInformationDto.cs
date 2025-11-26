@@ -1,13 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
+
+using System.Text.Json.Serialization;
 
 public record LoyaltyInformationDto
 {
     [JsonPropertyName("generatedAmount")]
-    public MonetaryDto GeneratedAmount { get; init; }
+    public MonetaryTypeDto? GeneratedAmount { get; init; }
 
     [JsonPropertyName("consumedAmount")]
-    public MonetaryDto ConsumedAmount { get; init; }
+    public MonetaryTypeDto? ConsumedAmount { get; init; }
 
     [JsonPropertyName("newBalance")]
-    public MonetaryDto NewBalance { get; init; }
+    public MonetaryTypeDto? NewBalance { get; init; }
 }

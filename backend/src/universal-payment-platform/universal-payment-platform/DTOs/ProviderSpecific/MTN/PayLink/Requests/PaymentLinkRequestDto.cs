@@ -1,20 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using universal_payment_platform.DTOs.ProviderSpecific.MTN.PayLink.Requests;
+﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
 public record PaymentLinkRequestDto
 {
     [JsonPropertyName("channel")]
-    public string Channel { get; init; }
+    public string? Channel { get; init; }
 
     [JsonPropertyName("quoteId")]
-    public string QuoteId { get; init; }
+    public string? QuoteId { get; init; }
 
     [JsonPropertyName("description")]
-    public string Description { get; init; }
+    public string? Description { get; init; }
 
     [JsonPropertyName("authenticationType")]
-    public string AuthenticationType { get; init; }
+    public string? AuthenticationType { get; init; }
 
     [JsonPropertyName("callbackUrl")]
     public string? CallbackUrl { get; init; }
@@ -23,10 +22,10 @@ public record PaymentLinkRequestDto
     public string? RedirectUrl { get; init; }
 
     [JsonPropertyName("deliveryMethod")]
-    public string DeliveryMethod { get; init; }
+    public string? DeliveryMethod { get; init; }
 
     [JsonPropertyName("payer")]
-    public PayerDto Payer { get; init; }
+    public PayerDto? Payer { get; init; }
 
     [JsonPropertyName("includePayerCharges")]
     public bool IncludePayerCharges { get; init; }
@@ -35,8 +34,8 @@ public record PaymentLinkRequestDto
     public List<string>? PaymentMethods { get; init; }
 
     [JsonPropertyName("totalAmount")]
-    public MoneyDto TotalAmount { get; init; }
+    public MonetaryTypeDto? TotalAmount { get; init; }
 
     [JsonPropertyName("itemDetails")]
-    public List<ItemDetailDto> ItemDetails { get; init; }
+    public List<ItemDetailDto>? ItemDetails { get; init; }
 }

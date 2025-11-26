@@ -1,11 +1,12 @@
-﻿using universal_payment_platform.DTOs.ProviderSpecific.MTN.History.Responses;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
-namespace Application.DTOs.Payments.Responses
+
+namespace universal_payment_platform.DTOs.ProviderSpecific.MTN.History.Responses
 {
     public record AccountDto
     {
         [JsonPropertyName("amount")]
-        public MoneyDto? Amount { get; init; }
+        public MonetaryTypeDto? Amount { get; init; }
     }
 }

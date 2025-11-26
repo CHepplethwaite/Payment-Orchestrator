@@ -3,6 +3,7 @@ using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Common;
+using universal_payment_platform.DTOs.@public;
 
 namespace universal_payment_platform.CQRS.Queries
 {

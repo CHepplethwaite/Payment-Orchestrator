@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 
 public record ReversePaymentDataDto
 {
@@ -45,25 +46,25 @@ public record ReversePaymentDataDto
     public PartyDto To { get; init; }
 
     [JsonPropertyName("originalAmount")]
-    public MonetaryDto OriginalAmount { get; init; }
+    public MonetaryTypeDto OriginalAmount { get; init; }
 
     [JsonPropertyName("externalAmount")]
-    public MonetaryDto ExternalAmount { get; init; }
+    public MonetaryTypeDto ExternalAmount { get; init; }
 
     [JsonPropertyName("amount")]
-    public MonetaryDto Amount { get; init; }
+    public MonetaryTypeDto Amount { get; init; }
 
     [JsonPropertyName("generatedAmount")]
-    public MonetaryDto GeneratedAmount { get; init; }
+    public MonetaryTypeDto GeneratedAmount { get; init; }
 
     [JsonPropertyName("consumedAmount")]
-    public MonetaryDto ConsumedAmount { get; init; }
+    public MonetaryTypeDto ConsumedAmount { get; init; }
 
     [JsonPropertyName("newBalance")]
-    public MonetaryDto NewBalance { get; init; }
+    public MonetaryTypeDto NewBalance { get; init; }
 
     [JsonPropertyName("fees")]
-    public List<MonetaryDto> Fees { get; init; }
+    public List<MonetaryTypeDto> Fees { get; init; }
 
     [JsonPropertyName("transactionText")]
     public string TransactionText { get; init; }

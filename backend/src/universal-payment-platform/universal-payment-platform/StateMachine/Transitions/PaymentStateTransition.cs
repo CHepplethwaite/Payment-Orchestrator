@@ -221,12 +221,12 @@ namespace universal_payment_platform.StateMachine.Transitions
             _action = action;
         }
 
-        public Task<bool> CanExecuteAsync(TContext context, IDictionary<string, object> parameters = null)
+        public Task<bool> CanExecuteAsync(TContext context, IDictionary<string, object>? parameters = null)
         {
             return _guard?.Invoke(context, parameters) ?? Task.FromResult(true);
         }
 
-        public Task<TransitionResult> ExecuteAsync(TContext context, IDictionary<string, object> parameters = null)
+        public Task<TransitionResult> ExecuteAsync(TContext context, IDictionary<string, object>? parameters = null)
         {
             return _action?.Invoke(context, parameters) ?? Task.FromResult(TransitionResult.Success());
         }
