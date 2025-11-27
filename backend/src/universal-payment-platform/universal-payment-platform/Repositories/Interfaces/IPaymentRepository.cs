@@ -8,5 +8,6 @@ namespace universal_payment_platform.Repositories.Interfaces
         Task<Payment?> GetByProviderIdAsync(string providerTransactionId);
         Task<Payment> AddAsync(Payment payment);
         Task UpdateAsync(Payment payment);
+        Task<Payment?> GetByIdAsync(Guid id);
     }
 }

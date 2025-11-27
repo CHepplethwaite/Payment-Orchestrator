@@ -4,6 +4,7 @@ using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Common;
 using universal_payment_platform.DTOs.@public;
+using System.Text.Json;
 
 namespace universal_payment_platform.CQRS.Queries
 {
@@ -25,80 +26,113 @@ namespace universal_payment_platform.CQRS.Queries
 
         public async Task<PaymentResponse> Handle(GetPaymentQuery query, CancellationToken cancellationToken)
         {
-            // 1. Check our database first
             var payment = await _paymentRepository.GetByExternalIdAsync(query.TransactionId);
 
             if (payment != null &&
-                (payment.Status == PaymentStatus.Success.ToString() ||
-                 payment.Status == PaymentStatus.Failed.ToString()))
+                (payment.Status == Common.PaymentStatus.Success || payment.Status == Common.PaymentStatus.Failed))
             {
-                _logger.LogInformation("Returning final status '{Status}' from DB for {TransactionId}",
-                    payment.Status, query.TransactionId);
+                _logger.LogInformation(
+                    "Returning final status '{Status}' from DB for {TransactionId}",
+                    payment.Status, query.TransactionId
+                );
+
+                // Deserialize the ProviderMetadata JSON string
+                var metadata = DeserializeProviderMetadata(payment.ProviderMetadata);
 
                 return new PaymentResponse
                 {
                     TransactionId = payment.ExternalTransactionId,
-                    Status = Enum.Parse<PaymentStatus>(payment.Status!),
-                    Message = payment.Message ?? string.Empty,
-                    ProviderReference = payment.ProviderTransactionId ?? string.Empty,
-                    Currency = payment.Currency ?? "ZMW"
+                    Status = payment.Status,
+                    Message = metadata?.Message ?? string.Empty,
+                    ProviderReference = metadata?.ProviderTransactionId ?? string.Empty,
+                    Currency = payment.Currency
                 };
             }
 
-            // 2. If status is Pending or not found, query the provider
             var adapter = _adapters.FirstOrDefault(a =>
                 a.GetAdapterName().Equals(query.Provider, StringComparison.OrdinalIgnoreCase));
 
             if (adapter == null)
             {
-                _logger.LogError("No adapter found for provider {Provider} when checking status", query.Provider);
+                _logger.LogError("No adapter found for provider {Provider}", query.Provider);
                 return new PaymentResponse
                 {
                     TransactionId = query.TransactionId,
-                    Status = PaymentStatus.Failed,
-                    Message = $"No adapter found for provider {query.Provider}",
+                    Status = PaymentStatus.Failed, // Use DTO PaymentStatus directly
+                    Message = $"Payment provider '{query.Provider}' not supported",
                     ProviderReference = string.Empty,
                     Currency = "ZMW"
                 };
             }
 
-            _logger.LogInformation("Querying provider {Provider} for status of {TransactionId}",
-                query.Provider, query.TransactionId);
-
             try
             {
                 var response = await adapter.CheckTransactionStatusAsync(query.TransactionId);
 
-                // 3. Update our database with the new status
                 if (payment == null)
                 {
-                    // Create a new record
+                    // Create new payment record
                     payment = new Payment
                     {
-                        ExternalTransactionId = query.TransactionId,
+                        Id = Guid.NewGuid(),
                         Provider = query.Provider,
-                        Status = response.Status.ToString(),
-                        Message = response.Message,
-                        ProviderTransactionId = response.ProviderReference,
-                        Currency = response.Currency // make sure Payment entity has Currency
+                        ExternalTransactionId = query.TransactionId,
+                        Amount = 0, // Amount might not be available in status check
+                        Currency = response.Currency ?? "ZMW",
+                        Status = ConvertToEntityStatus(response.Status), // Convert DTO status to entity status
+                        Description = "Payment created via status query",
+                        CreatedAt = DateTime.UtcNow,
+                        Payer = new PayerInfo(),
+                        Payees = new List<PayeeInfo>(),
+                        AuditTrail = new List<PaymentAudit>()
                     };
+
+                    // Set initial provider metadata
+                    var initialMetadata = new
+                    {
+                        TransactionId = query.TransactionId,
+                        Provider = query.Provider,
+                        ProviderTransactionId = response.ProviderReference ?? string.Empty,
+                        Message = response.Message ?? string.Empty,
+                        CreatedVia = "StatusQuery",
+                        QueriedAt = DateTime.UtcNow
+                    };
+                    payment.ProviderMetadata = JsonSerializer.Serialize(initialMetadata);
+
                     await _paymentRepository.AddAsync(payment);
                 }
                 else
                 {
-                    payment.Status = response.Status.ToString();
-                    payment.Message = response.Message;
-                    payment.ProviderTransactionId = response.ProviderReference;
-                    payment.Currency = response.Currency;
+                    // Update existing payment
+                    payment.Status = ConvertToEntityStatus(response.Status); // Convert DTO status to entity status
+
+                    // Update provider metadata
+                    var updatedMetadata = new
+                    {
+                        TransactionId = query.TransactionId,
+                        Provider = query.Provider,
+                        ProviderTransactionId = response.ProviderReference ?? string.Empty,
+                        Message = response.Message ?? string.Empty,
+                        UpdatedVia = "StatusQuery",
+                        QueriedAt = DateTime.UtcNow,
+                        PreviousStatus = payment.Status.ToString()
+                    };
+                    payment.ProviderMetadata = JsonSerializer.Serialize(updatedMetadata);
+
+                    // Update completed time if successful - compare using converted status
+                    if (ConvertToEntityStatus(response.Status) == Common.PaymentStatus.Success)
+                    {
+                        payment.CompletedAt = DateTime.UtcNow;
+                    }
+
                     await _paymentRepository.UpdateAsync(payment);
                 }
 
-                // Return response with all required fields
                 return new PaymentResponse
                 {
-                    TransactionId = response.TransactionId,
+                    TransactionId = response.TransactionId ?? query.TransactionId,
                     Status = response.Status,
-                    Message = response.Message,
+                    Message = response.Message ?? string.Empty,
                     ProviderReference = response.ProviderReference ?? string.Empty,
                     Currency = response.Currency ?? "ZMW"
                 };
@@ -106,15 +140,67 @@ namespace universal_payment_platform.CQRS.Queries
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking payment status for {TransactionId}", query.TransactionId);
+
                 return new PaymentResponse
                 {
                     TransactionId = query.TransactionId,
-                    Status = PaymentStatus.Failed,
-                    Message = $"Exception: {ex.Message}",
+                    Status = PaymentStatus.Failed, // Use DTO PaymentStatus directly
+                    Message = $"Error querying provider: {ex.Message}",
                     ProviderReference = string.Empty,
                     Currency = "ZMW"
                 };
             }
         }
+
+        // Helper method to deserialize ProviderMetadata JSON
+        private ProviderMetadataDto? DeserializeProviderMetadata(string? providerMetadataJson)
+        {
+            if (string.IsNullOrEmpty(providerMetadataJson))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<ProviderMetadataDto>(providerMetadataJson);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Failed to deserialize ProviderMetadata JSON");
+                return null;
+            }
+        }
+
+        // Helper method to convert Entity PaymentStatus to DTO PaymentStatus
+        private PaymentStatus ConvertToDtoStatus(Common.PaymentStatus entityStatus)
+        {
+            return entityStatus switch
+            {
+                Common.PaymentStatus.Pending => PaymentStatus.Pending,
+                Common.PaymentStatus.Success => PaymentStatus.Success,
+                Common.PaymentStatus.Failed => PaymentStatus.Failed,
+                _ => PaymentStatus.Pending
+            };
+        }
+
+        // Helper method to convert DTO PaymentStatus to Entity PaymentStatus
+        private Common.PaymentStatus ConvertToEntityStatus(PaymentStatus dtoStatus)
+        {
+            return dtoStatus switch
+            {
+                PaymentStatus.Pending => Common.PaymentStatus.Pending,
+                PaymentStatus.Success => Common.PaymentStatus.Success,
+                PaymentStatus.Failed => Common.PaymentStatus.Failed,
+                _ =>    Common.PaymentStatus.Pending
+            };
+        }
+    }
+
+    // DTO for deserializing ProviderMetadata JSON
+    public class ProviderMetadataDto
+    {
+        public string? TransactionId { get; set; }
+        public string? Provider { get; set; }
+        public string? Message { get; set; }
+        public string? ProviderTransactionId { get; set; }
+        public string? Currency { get; set; }
     }
 }

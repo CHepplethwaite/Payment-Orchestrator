@@ -36,7 +36,7 @@ namespace universal_payment_platform.Services.Adapters.Airtel
                 Message = "Payment successful",
                 ProviderReference = "AIRTEL-" + Guid.NewGuid(),
                 Currency = request.Currency ?? "ZMW",
-                Status = PaymentStatus.Success
+                Status = Enums.Success
             };
         }
 
@@ -51,7 +51,7 @@ namespace universal_payment_platform.Services.Adapters.Airtel
                 Message = "Transaction found",
                 ProviderReference = transactionId,
                 Currency = "ZMW",
-                Status = PaymentStatus.Success
+                Status = Enums.Success
             };
         }
     }

@@ -6,25 +6,25 @@ namespace universal_payment_platform.Data.Entities
     {
         public Guid Id { get; set; }
 
-        // Enum backed status
-        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+        // Core generic info
+        public string Provider { get; set; } = null!;                  // MTN, Airtel, Stripe...
+        public string ExternalTransactionId { get; set; } = null!;    // Provider transaction id
+        public decimal Amount { get; set; }                            // Amount of payment
+        public string Currency { get; set; } = "ZMW";                  // ISO currency code
+        public PaymentStatus Status { get; set; }
 
-        // Audit and timestamps
+        public string Description { get; set; } = string.Empty;
+
+        // Optional provider-specific payload stored as JSON
+        public string? ProviderMetadata { get; set; }
+
+        // Timestamps
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? CompletedAt { get; set; }
 
-        // Provider transaction reference
-        public string? TransactionId { get; set; }
-
-        // How much hit the provider actually charges/settles
-        public decimal? SettlementAmount { get; set; }
-
-        // Who initiated it
-        public string? UserId { get; set; }
-
-        public decimal Amount { get; set; }
-
-        public ApplicationUser User { get; set; } = null!;
+        // Payer and Payee info
+        public PayerInfo Payer { get; set; } = new();
+        public List<PayeeInfo> Payees { get; set; } = new();
 
         // Domain audit trail (optional)
         public List<PaymentAudit> AuditTrail { get; set; } = new();
@@ -39,4 +39,22 @@ namespace universal_payment_platform.Data.Entities
             });
         }
     }
+
+    public class PayerInfo
+    {
+        public string Id { get; set; } = null!;         // e.g., MSISDN, Email
+        public string Name { get; set; } = string.Empty;
+        public string? Email { get; set; }
+        public string? Note { get; set; }
+    }
+
+    public class PayeeInfo
+    {
+        public string Id { get; set; } = null!;        // Merchant or user ID
+        public string Name { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string Currency { get; set; } = "ZMW";
+        public string? Note { get; set; }
+    }
+
 }

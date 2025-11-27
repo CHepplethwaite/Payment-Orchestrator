@@ -1,67 +1,33 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using universal_payment_platform.Data.Entities;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
+namespace universal_payment_platform.Data
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
+    public class ApplicationDbContext : DbContext
     {
-    }
-
-        // ------------------------
-        // DbSets for your entities
-        // ------------------------
-        public DbSet<Payment> Payments { get; set; } = null!;
-        public DbSet<Transaction> Transactions { get; set; } = null!;
-        public DbSet<KycRecord> KycRecords { get; set; } = null!;
-        public DbSet<Merchant> Merchants { get; set; } = null!;
-        public DbSet<SettlementAccount> SettlementAccounts { get; set; } = null!;
-
-        protected override void OnModelCreating(ModelBuilder builder)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            base.OnModelCreating(builder);
-
-            // ------------------------
-            // Configure relationships
-            // ------------------------
-
-            // ApplicationUser → Payments
-            builder.Entity<Payment>()
-                .HasOne(p => p.User)
-                .WithMany(u => u.Payments)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // ApplicationUser → Transactions
-            builder.Entity<Transaction>()
-                .HasOne(t => t.User)
-                .WithMany(u => u.Transactions)
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // ApplicationUser → KycRecords
-            builder.Entity<KycRecord>()
-                .HasOne(k => k.User)
-                .WithMany(u => u.KycRecords)
-                .HasForeignKey(k => k.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Merchant → SettlementAccounts
-            builder.Entity<SettlementAccount>()
-                .HasOne(sa => sa.Merchant)
-                .WithMany(m => m.SettlementAccounts)
-                .HasForeignKey(sa => sa.MerchantId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Optional: Configure decimal precision for money fields
-            builder.Entity<Payment>()
-                .Property(p => p.Amount)
-                .HasPrecision(18, 2);
-
-            builder.Entity<Transaction>()
-                .Property(t => t.Amount)
-                .HasPrecision(18, 2);
         }
-    
+
+        public DbSet<Payment> Payments { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure Payment entity
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+
+                // Remove User configuration since your Payment entity doesn't have User property
+                // Configure owned types if needed for PayerInfo, PayeeInfo, etc.
+
+                // Configure indexes
+                entity.HasIndex(p => p.ExternalTransactionId);
+                entity.HasIndex(p => p.CreatedAt);
+                entity.HasIndex(p => p.Status);
+            });
+        }
+    }
 }

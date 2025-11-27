@@ -1,9 +1,4 @@
-﻿// File: universal-payment-platform/DTOs/Responses/PaymentResponse.cs
-
-
-// File: universal-payment-platform/DTOs/Responses/PaymentResponse.cs
-
-using universal_payment_platform.Common;
+﻿using universal_payment_platform.Common;
 
 namespace universal_payment_platform.DTOs.@public
 {
@@ -14,11 +9,11 @@ namespace universal_payment_platform.DTOs.@public
     {
         // Properties used in your handler's initialization and updates:
         public required string TransactionId { get; set; }  // Maps to the external transaction ID
-        public PaymentStatus Status { get; set; }  // FIXES missing Status (e.g., Completed, Failed)
-        public required string Message { get; set; }        // FIXES missing Message (e.g., "Success", "Card declined")
+        public PaymentStatus Status { get; set; } 
+        public required string Message { get; set; }      
 
         // Other crucial properties for a universal payment platform response:
-        public required string ProviderReference { get; set; } // The ID assigned by the external provider (e.g., Stripe ID)
+        public required string ProviderReference { get; set; } 
         public decimal Amount { get; set; }
         public required string Currency { get; set; }
     }

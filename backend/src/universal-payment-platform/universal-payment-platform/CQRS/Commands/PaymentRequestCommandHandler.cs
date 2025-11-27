@@ -4,8 +4,9 @@ using Polly.Retry;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Interfaces;
-using universal_payment_platform.Common;
 using universal_payment_platform.DTOs.@public;
+using universal_payment_platform.Common;
+using System.Text.Json;
 
 namespace universal_payment_platform.CQRS.Commands
 {
@@ -54,60 +55,96 @@ namespace universal_payment_platform.CQRS.Commands
                     TransactionId = command.TransactionId,
                     Status = PaymentStatus.Failed,
                     Message = $"No adapter found for provider {command.Provider}",
-                    Currency = command.Currency ?? "ZMW",              // Required
-                    ProviderReference = string.Empty                  // Required
+                    Currency = command.Currency ?? "ZMW",
+                    ProviderReference = string.Empty
                 };
             }
 
-            // 1. Create Payment record in DB *before* processing
+            // 1. Create Payment record in DB - EXACTLY MATCHING YOUR ENTITY
             var payment = new Payment
             {
+                Id = Guid.NewGuid(),
+                Provider = command.Provider,
                 ExternalTransactionId = command.TransactionId,
                 Amount = command.Amount,
-                Provider = command.Provider,
-                Status = PaymentStatus.Pending.ToString(),
+                Currency = command.Currency ?? "ZMW",
+                Status = (PaymentStatus)PaymentStatus.Pending, // Explicit cast to PaymentStatus
+                Description = command.Description ?? string.Empty,
+                CreatedAt = DateTime.UtcNow,
+                Payer = new PayerInfo(), // Initialize empty
+                Payees = new List<PayeeInfo>(),
+                AuditTrail = new List<PaymentAudit>()
             };
+
+            // Add initial provider metadata as JSON
+            var providerMetadata = new
+            {
+                TransactionId = command.TransactionId,
+                Provider = command.Provider,
+                Currency = command.Currency ?? "ZMW",
+                RequestedAt = DateTime.UtcNow
+            };
+
+            payment.ProviderMetadata = JsonSerializer.Serialize(providerMetadata);
+
+            // Add initial audit trail
+            payment.AddAuditTrail($"Payment created for {command.Provider} with amount {command.Amount} {command.Currency}");
+
             await _paymentRepository.AddAsync(payment);
 
             try
             {
                 _logger.LogInformation(
-                    "Initiating payment via {Provider} for ExternalTransactionId {TransactionId}",
+                    "Initiating payment via {Provider} for TransactionId {TransactionId}",
                     command.Provider, command.TransactionId
                 );
 
                 var context = new Context { ["TransactionId"] = command.TransactionId };
 
-                // 2. Call the provider adapter
                 var response = await _retryPolicy.ExecuteAsync(ctx =>
                     adapter.MakePaymentAsync(command), context
                 );
 
-                // 3. Update Payment record with the result
-                payment.Status = response.Status.ToString();
-                payment.Message = response.Message;
-                payment.ProviderTransactionId = response.ProviderReference;
-                await _paymentRepository.UpdateAsync(payment);
+                // Update Payment record with provider response
+                // Convert DTO PaymentStatus to Entity PaymentStatus using cast
+                payment.Status = (PaymentStatus)response.Status;
 
-                // Ensure required fields are set
-                response.TransactionId = payment.ExternalTransactionId;
-                response.Currency ??= command.Currency ?? "ZMW";
-                response.ProviderReference ??= payment.ProviderTransactionId ?? string.Empty;
+                // Update provider metadata with response details
+                var updatedMetadata = new
+                {
+                    TransactionId = command.TransactionId,
+                    Provider = command.Provider,
+                    Currency = command.Currency ?? "ZMW",
+                    RequestedAt = payment.CreatedAt,
+                    ProviderTransactionId = response.ProviderReference ?? string.Empty,
+                    ProviderMessage = response.Message ?? string.Empty,
+                    RespondedAt = DateTime.UtcNow,
+                    Status = response.Status.ToString()
+                };
 
+                payment.ProviderMetadata = JsonSerializer.Serialize(updatedMetadata);
+
+                // If we got a provider reference, update the external transaction ID
+                if (!string.IsNullOrEmpty(response.ProviderReference))
+                {
+                    payment.ExternalTransactionId = response.ProviderReference;
+                }
+
+                // Update completed time if successful
                 if (response.Status == PaymentStatus.Success)
                 {
-                    _logger.LogInformation(
-                        "Payment succeeded for ExternalTransactionId {TransactionId} via {Provider}",
-                        command.TransactionId, command.Provider
-                    );
+                    payment.CompletedAt = DateTime.UtcNow;
                 }
-                else
-                {
-                    _logger.LogWarning(
-                        "Payment failed for ExternalTransactionId {TransactionId} via {Provider}: {Message}",
-                        command.TransactionId, command.Provider, response.Message
-                    );
-                }
+
+                // Add to audit trail
+                payment.AddAuditTrail($"Payment status updated to {response.Status} via {command.Provider}");
+
+                await _paymentRepository.UpdateAsync(payment);
+
+                // Ensure response has all required fields
+                response.TransactionId = payment.ExternalTransactionId;
+                response.Currency = payment.Currency;
+                response.ProviderReference = response.ProviderReference ?? string.Empty;
 
                 return response;
             }
@@ -115,13 +152,30 @@ namespace universal_payment_platform.CQRS.Commands
             {
                 _logger.LogError(
                     ex,
-                    "Exception occurred while processing payment for ExternalTransactionId {TransactionId} via {Provider}",
+                    "Exception occurred while processing payment for TransactionId {TransactionId} via {Provider}",
                     command.TransactionId, command.Provider
                 );
 
-                // Update Payment record as failed
-                payment.Status = PaymentStatus.Failed.ToString();
-                payment.Message = ex.Message;
+                // Update payment as failed
+                payment.Status = (PaymentStatus)PaymentStatus.Failed;
+
+                // Update provider metadata with error
+                var errorMetadata = new
+                {
+                    TransactionId = command.TransactionId,
+                    Provider = command.Provider,
+                    Currency = command.Currency ?? "ZMW",
+                    RequestedAt = payment.CreatedAt,
+                    Error = ex.Message,
+                    FailedAt = DateTime.UtcNow,
+                    Status = "Failed"
+                };
+
+                payment.ProviderMetadata = JsonSerializer.Serialize(errorMetadata);
+
+                // Add to audit trail
+                payment.AddAuditTrail($"Payment failed: {ex.Message}");
+
                 await _paymentRepository.UpdateAsync(payment);
 
                 return new PaymentResponse
@@ -129,8 +183,8 @@ namespace universal_payment_platform.CQRS.Commands
                     TransactionId = command.TransactionId,
                     Status = PaymentStatus.Failed,
                     Message = ex.Message,
-                    Currency = command.Currency ?? "ZMW",     // Required
-                    ProviderReference = string.Empty          // Required
+                    Currency = command.Currency ?? "ZMW",
+                    ProviderReference = string.Empty
                 };
             }
         }
