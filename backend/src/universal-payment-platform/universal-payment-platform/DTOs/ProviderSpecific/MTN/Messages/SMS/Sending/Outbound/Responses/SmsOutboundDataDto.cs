@@ -3,5 +3,5 @@
 public record SmsOutboundDataDto
 {
     [JsonPropertyName("status")]
-    public string Status { get; init; }
+    public string? Status { get; init; }
 }

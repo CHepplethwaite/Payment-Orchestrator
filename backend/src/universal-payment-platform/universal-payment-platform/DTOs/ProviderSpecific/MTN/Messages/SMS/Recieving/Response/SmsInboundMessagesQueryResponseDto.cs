@@ -6,15 +6,15 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.SMS.Inbound
     public record SmsInboundMessagesQueryResponseDto
     {
         [JsonPropertyName("statusCode")]
-        public string StatusCode { get; init; }
+        public string? StatusCode { get; init; }
 
         [JsonPropertyName("statusMessage")]
-        public string StatusMessage { get; init; }
+        public string? StatusMessage { get; init; }
 
         [JsonPropertyName("transactionId")]
-        public string TransactionId { get; init; }
+        public string? TransactionId { get; init; }
 
         [JsonPropertyName("data")]
-        public SmsInboundMessagesQueryDataDto Data { get; init; }
+        public SmsInboundMessagesQueryDataDto? Data { get; init; }
     }
 }

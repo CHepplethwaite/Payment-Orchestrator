@@ -3,10 +3,10 @@
 public record PaymentAgreementRequestDto
 {
     [JsonPropertyName("billingAccountNo")]
-    public string BillingAccountNo { get; init; }
+    public string? BillingAccountNo { get; init; }
 
     [JsonPropertyName("serviceName")]
-    public string ServiceName { get; init; }
+    public string? ServiceName { get; init; }
 
     [JsonPropertyName("promiseOpenDate")]
     public DateTime PromiseOpenDate { get; init; }
@@ -15,11 +15,11 @@ public record PaymentAgreementRequestDto
     public double PromiseAmount { get; init; }
 
     [JsonPropertyName("numberOfInstallments")]
-    public string NumberOfInstallments { get; init; }
+    public string? NumberOfInstallments { get; init; }
 
     [JsonPropertyName("durationUOM")]
-    public string DurationUOM { get; init; }
+    public string? DurationUOM { get; init; }
 
     [JsonPropertyName("promiseThreshold")]
-    public string PromiseThreshold { get; init; }
+    public string? PromiseThreshold { get; init; }
 }

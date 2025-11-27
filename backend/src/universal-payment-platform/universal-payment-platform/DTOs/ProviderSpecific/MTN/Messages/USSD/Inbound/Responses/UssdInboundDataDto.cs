@@ -3,7 +3,7 @@
 public record UssdInboundDataDto
 {
     [JsonPropertyName("inboundResponse")]
-    public string InboundResponse { get; init; }
+    public string? InboundResponse { get; init; }
 
     [JsonPropertyName("userInputRequired")]
     public bool UserInputRequired { get; init; }
@@ -12,8 +12,8 @@ public record UssdInboundDataDto
     public int MessageType { get; init; }
 
     [JsonPropertyName("serviceCode")]
-    public string ServiceCode { get; init; }
+    public string? ServiceCode { get; init; }
 
     [JsonPropertyName("msisdn")]
-    public string Msisdn { get; init; }
+    public string? Msisdn { get; init; }
 }

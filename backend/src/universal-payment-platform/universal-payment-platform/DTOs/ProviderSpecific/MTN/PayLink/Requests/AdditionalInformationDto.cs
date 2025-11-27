@@ -3,8 +3,8 @@
 public record AdditionalInformationDto
 {
     [JsonPropertyName("key")]
-    public string Key { get; init; }
+    public string? Key { get; init; }
 
     [JsonPropertyName("value")]
-    public string Value { get; init; }
+    public string? Value { get; init; }
 }

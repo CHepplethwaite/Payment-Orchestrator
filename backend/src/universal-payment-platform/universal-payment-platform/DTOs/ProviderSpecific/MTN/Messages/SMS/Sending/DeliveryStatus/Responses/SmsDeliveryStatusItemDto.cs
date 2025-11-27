@@ -3,10 +3,10 @@
 public record SmsDeliveryStatusItemDto
 {
     [JsonPropertyName("address")]
-    public string Address { get; init; }
+    public string? Address { get; init; }
 
     [JsonPropertyName("status")]
-    public string Status { get; init; }
+    public string? Status { get; init; }
 
     [JsonPropertyName("deliveredTime")]
     public DateTime? DeliveredTime { get; init; }

@@ -3,17 +3,17 @@
 public record UssdOutboundRequestDto
 {
     [JsonPropertyName("sessionId")]
-    public string SessionId { get; init; }
+    public string? SessionId { get; init; }
 
     [JsonPropertyName("messageType")]
-    public string MessageType { get; init; }
+    public string? MessageType { get; init; }
 
     [JsonPropertyName("msisdn")]
-    public string Msisdn { get; init; }
+    public string? Msisdn { get; init; }
 
     [JsonPropertyName("serviceCode")]
-    public string ServiceCode { get; init; }
+    public string? ServiceCode { get; init; }
 
     [JsonPropertyName("ussdString")]
-    public string UssdString { get; init; }
+    public string? UssdString { get; init; }
 }

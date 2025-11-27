@@ -3,11 +3,11 @@
 public record LinkDto
 {
     [JsonPropertyName("self")]
-    public SelfLinkDto Self { get; init; }
+    public SelfLinkDto? Self { get; init; }
 }
 
 public record SelfLinkDto
 {
     [JsonPropertyName("href")]
-    public string Href { get; init; }
+    public string? Href { get; init; }
 }

@@ -5,7 +5,7 @@ namespace Application.DTOs.Payments.Requests
     public record PaymentHistoryRequestDto
     {
         [JsonPropertyName("id")]
-        public string Id { get; init; }
+        public string? Id { get; init; }
 
         [JsonPropertyName("endDate")]
         public string? EndDate { get; init; }

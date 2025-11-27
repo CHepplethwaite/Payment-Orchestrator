@@ -3,11 +3,11 @@
 public record PaymentLinkDataDto
 {
     [JsonPropertyName("providerTransactionId")]
-    public string ProviderTransactionId { get; init; }
+    public string? ProviderTransactionId { get; init; }
 
     [JsonPropertyName("orderRedirectUrl")]
-    public string OrderRedirectUrl { get; init; }
+    public string? OrderRedirectUrl { get; init; }
 
     [JsonPropertyName("links")]
-    public LinkDto Links { get; init; }
+    public LinkDto? Links { get; init; }
 }

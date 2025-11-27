@@ -3,11 +3,11 @@
 public record UssdSubscriptionRequestDto
 {
     [JsonPropertyName("serviceCode")]
-    public string ServiceCode { get; init; }
+    public string? ServiceCode { get; init; }
 
     [JsonPropertyName("callbackUrl")]
-    public string CallbackUrl { get; init; }
+    public string? CallbackUrl { get; init; }
 
     [JsonPropertyName("targetSystem")]
-    public string TargetSystem { get; init; }
+    public string? TargetSystem { get; init; }
 }

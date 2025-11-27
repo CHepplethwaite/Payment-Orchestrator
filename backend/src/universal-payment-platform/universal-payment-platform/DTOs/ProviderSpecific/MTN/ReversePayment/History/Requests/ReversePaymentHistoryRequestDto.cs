@@ -3,7 +3,7 @@
 public record ReversePaymentHistoryRequestDto
 {
     [JsonPropertyName("transactionType")]
-    public string TransactionType { get; init; }
+    public string? TransactionType { get; init; }
 
     [JsonPropertyName("amount")]
     public decimal? Amount { get; init; }
@@ -21,17 +21,17 @@ public record ReversePaymentHistoryRequestDto
     public int? PageNo { get; init; }
 
     [JsonPropertyName("nodeId")]
-    public string NodeId { get; init; }
+    public string? NodeId { get; init; }
 
     [JsonPropertyName("otherFri")]
-    public string OtherFri { get; init; }
+    public string? OtherFri { get; init; }
 
     [JsonPropertyName("posMsisdn")]
-    public string PosMsisdn { get; init; }
+    public string? PosMsisdn { get; init; }
 
     [JsonPropertyName("quoteId")]
-    public string QuoteId { get; init; }
+    public string? QuoteId { get; init; }
 
     [JsonPropertyName("transactionStatus")]
-    public string TransactionStatus { get; init; }
+    public string? TransactionStatus { get; init; }
 }

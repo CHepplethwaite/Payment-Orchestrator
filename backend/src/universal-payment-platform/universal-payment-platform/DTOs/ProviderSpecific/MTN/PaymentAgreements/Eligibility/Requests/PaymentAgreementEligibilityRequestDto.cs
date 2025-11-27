@@ -3,5 +3,5 @@
 public record PaymentAgreementEligibilityRequestDto
 {
     [JsonPropertyName("billingAccountNumber")]
-    public string BillingAccountNumber { get; init; }
+    public string? BillingAccountNumber { get; init; }
 }

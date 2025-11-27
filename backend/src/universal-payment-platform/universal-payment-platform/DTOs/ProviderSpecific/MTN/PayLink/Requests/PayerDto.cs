@@ -6,7 +6,7 @@ public record PayerDto
     public string? PayerIdType { get; init; }
 
     [JsonPropertyName("payerId")]
-    public string PayerId { get; init; }
+    public string? PayerId { get; init; }
 
     [JsonPropertyName("payerNote")]
     public string? PayerNote { get; init; }

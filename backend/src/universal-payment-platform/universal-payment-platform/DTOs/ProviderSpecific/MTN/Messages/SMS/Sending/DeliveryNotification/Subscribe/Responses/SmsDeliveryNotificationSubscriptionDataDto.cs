@@ -5,9 +5,9 @@ namespace UniversalPaymentPlatform.DTOs.ProviderSpecific.MTN.SMS.Delivery
     public record SmsDeliveryNotificationSubscriptionDataDto
     {
         [JsonPropertyName("subscriptionId")]
-        public string SubscriptionId { get; init; }
+        public string? SubscriptionId { get; init; }
 
         [JsonPropertyName("links")]
-        public LinkDto Links { get; init; }
+        public LinkDto? Links { get; init; }
     }
 }

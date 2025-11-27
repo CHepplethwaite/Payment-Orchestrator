@@ -3,5 +3,5 @@
 public record UssdSubscriptionDataDto
 {
     [JsonPropertyName("subscriptionId")]
-    public string SubscriptionId { get; init; }
+    public string? SubscriptionId { get; init; }
 }

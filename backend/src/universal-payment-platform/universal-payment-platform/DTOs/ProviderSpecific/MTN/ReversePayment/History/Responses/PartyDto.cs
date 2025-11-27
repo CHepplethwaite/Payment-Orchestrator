@@ -4,37 +4,37 @@ using universal_payment_platform.DTOs.ProviderSpecific.MTN.Shared;
 public record PartyDto
 {
     [JsonPropertyName("fri")]
-    public string FRI { get; init; }
+    public string? FRI { get; init; }
 
     [JsonPropertyName("account")]
-    public string Account { get; init; }
+    public string? Account { get; init; }
 
     [JsonPropertyName("accountHolder")]
-    public string AccountHolder { get; init; }
+    public string? AccountHolder { get; init; }
 
     [JsonPropertyName("firstName")]
-    public string FirstName { get; init; }
+    public string? FirstName { get; init; }
 
     [JsonPropertyName("lastName")]
-    public string LastName { get; init; }
+    public string? LastName { get; init; }
 
     [JsonPropertyName("handlerFirstName")]
-    public string HandlerFirstName { get; init; }
+    public string? HandlerFirstName { get; init; }
 
     [JsonPropertyName("handlerLastName")]
-    public string HandlerLastName { get; init; }
+    public string? HandlerLastName { get; init; }
 
     [JsonPropertyName("posMsisdn")]
-    public string PosMsisdn { get; init; }
+    public string? PosMsisdn { get; init; }
 
     [JsonPropertyName("note")]
-    public string Note { get; init; }
+    public string? Note { get; init; }
 
     [JsonPropertyName("amount")]
-    public MonetaryTypeDto Amount { get; init; }
+    public MonetaryTypeDto? Amount { get; init; }
 
     [JsonPropertyName("fee")]
-    public MonetaryTypeDto Fee { get; init; }
+    public MonetaryTypeDto? Fee { get; init; }
 
     [JsonPropertyName("externalFee")]
     public MonetaryTypeDto? ExternalFee { get; init; }

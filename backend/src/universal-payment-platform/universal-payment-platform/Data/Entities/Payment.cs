@@ -20,7 +20,11 @@ namespace universal_payment_platform.Data.Entities
         public decimal? SettlementAmount { get; set; }
 
         // Who initiated it
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
+
+        public decimal Amount { get; set; }
+
+        public ApplicationUser User { get; set; } = null!;
 
         // Domain audit trail (optional)
         public List<PaymentAudit> AuditTrail { get; set; } = new();

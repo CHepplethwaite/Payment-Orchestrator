@@ -3,11 +3,11 @@
 public record UssdOutboundDataDto
 {
     [JsonPropertyName("outboundResponse")]
-    public string OutboundResponse { get; init; }
+    public string? OutboundResponse { get; init; }
 
     [JsonPropertyName("sessionId")]
-    public string SessionId { get; init; }
+    public string? SessionId { get; init; }
 
     [JsonPropertyName("msisdn")]
-    public string Msisdn { get; init; }
+    public string? Msisdn { get; init; }
 }

@@ -8,16 +8,16 @@ namespace Application.DTOs.Payments.Responses
     public record PaymentHistoryDataDto
     {
         [JsonPropertyName("id")]
-        public string Id { get; init; }
+        public string? Id { get; init; }
 
         [JsonPropertyName("href")]
-        public string Href { get; init; }
+        public string? Href { get; init; }
 
         [JsonPropertyName("authorizationCode")]
         public string? AuthorizationCode { get; init; }
 
         [JsonPropertyName("correlatorId")]
-        public string CorrelatorId { get; init; }
+        public string? CorrelatorId { get; init; }
 
         [JsonPropertyName("description")]
         public string? Description { get; init; }
