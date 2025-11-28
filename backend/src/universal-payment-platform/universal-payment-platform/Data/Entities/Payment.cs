@@ -26,6 +26,11 @@ namespace universal_payment_platform.Data.Entities
         public PayerInfo Payer { get; set; } = new();
         public List<PayeeInfo> Payees { get; set; } = new();
 
+        public string? UserId { get; set; }
+
+        // Optional navigation property
+        public AppUser? User { get; set; }
+
         // Domain audit trail (optional)
         public List<PaymentAudit> AuditTrail { get; set; } = new();
 

@@ -12,8 +12,8 @@ using universal_payment_platform.Data;
 namespace universal_payment_platform.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251106075819_InitialIdentitySetup")]
-    partial class InitialIdentitySetup
+    [Migration("20251128194328_FixPayerInfoTable")]
+    partial class FixPayerInfoTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,7 +48,7 @@ namespace universal_payment_platform.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -73,7 +73,7 @@ namespace universal_payment_platform.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -98,7 +98,7 @@ namespace universal_payment_platform.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -120,7 +120,7 @@ namespace universal_payment_platform.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -135,7 +135,7 @@ namespace universal_payment_platform.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -154,10 +154,10 @@ namespace universal_payment_platform.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -169,9 +169,6 @@ namespace universal_payment_platform.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -179,8 +176,8 @@ namespace universal_payment_platform.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                    b.Property<string>("FullName")
+                        .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -224,62 +221,56 @@ namespace universal_payment_platform.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.KycRecord", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.PayeeInfo", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DocumentNumber")
-                        .IsRequired()
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<string>("DocumentType")
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Currency")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("KycRecords");
-                });
-
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.Merchant", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("ContactNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Merchants");
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("PayeeInfo");
+                });
+
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.PayerInfo", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PayerInfo");
                 });
 
             modelBuilder.Entity("universal_payment_platform.Data.Entities.Payment", b =>
@@ -292,84 +283,77 @@ namespace universal_payment_platform.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.SettlementAccount", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("BankName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Currency")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasColumnType("text");
 
-                    b.Property<Guid>("MerchantId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExternalTransactionId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("PayerId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderMetadata")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MerchantId");
+                    b.HasIndex("CreatedAt");
 
-                    b.ToTable("SettlementAccounts");
+                    b.HasIndex("ExternalTransactionId");
+
+                    b.HasIndex("PayerId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments", (string)null);
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.Transaction", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.PaymentAudit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                    b.Property<string>("Message")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PaymentId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("PaymentAudit");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -383,7 +367,7 @@ namespace universal_payment_platform.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", null)
+                    b.HasOne("universal_payment_platform.Data.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -392,7 +376,7 @@ namespace universal_payment_platform.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", null)
+                    b.HasOne("universal_payment_platform.Data.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -407,7 +391,7 @@ namespace universal_payment_platform.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", null)
+                    b.HasOne("universal_payment_platform.Data.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -416,69 +400,55 @@ namespace universal_payment_platform.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", null)
+                    b.HasOne("universal_payment_platform.Data.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.KycRecord", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.PayeeInfo", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", "User")
-                        .WithMany("KycRecords")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
+                    b.HasOne("universal_payment_platform.Data.Entities.Payment", null)
+                        .WithMany("Payees")
+                        .HasForeignKey("PaymentId");
                 });
 
             modelBuilder.Entity("universal_payment_platform.Data.Entities.Payment", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", "User")
+                    b.HasOne("universal_payment_platform.Data.Entities.PayerInfo", "Payer")
+                        .WithMany()
+                        .HasForeignKey("PayerId");
+
+                    b.HasOne("universal_payment_platform.Data.Entities.AppUser", "User")
                         .WithMany("Payments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Payer");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.SettlementAccount", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.PaymentAudit", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.Merchant", "Merchant")
-                        .WithMany("SettlementAccounts")
-                        .HasForeignKey("MerchantId")
+                    b.HasOne("universal_payment_platform.Data.Entities.Payment", null)
+                        .WithMany("AuditTrail")
+                        .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Merchant");
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.Transaction", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.AppUser", b =>
                 {
-                    b.HasOne("universal_payment_platform.Data.Entities.ApplicationUser", "User")
-                        .WithMany("Transactions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.ApplicationUser", b =>
-                {
-                    b.Navigation("KycRecords");
-
                     b.Navigation("Payments");
-
-                    b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("universal_payment_platform.Data.Entities.Merchant", b =>
+            modelBuilder.Entity("universal_payment_platform.Data.Entities.Payment", b =>
                 {
-                    b.Navigation("SettlementAccounts");
+                    b.Navigation("AuditTrail");
+
+                    b.Navigation("Payees");
                 });
 #pragma warning restore 612, 618
         }

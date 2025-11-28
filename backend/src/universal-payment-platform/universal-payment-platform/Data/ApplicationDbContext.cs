@@ -1,32 +1,65 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using universal_payment_platform.Data.Entities;
 
 namespace universal_payment_platform.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext
+        : IdentityDbContext<AppUser, IdentityRole, string>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options
+        ) : base(options)
         {
         }
 
         public DbSet<Payment> Payments { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            // Configure Payment entity
-            modelBuilder.Entity<Payment>(entity =>
+            //----------------------------------------------------------------------
+            // IDENTITY TABLE NAMING
+            //----------------------------------------------------------------------
+            builder.Entity<AppUser>().ToTable("Users");
+            builder.Entity<IdentityRole>().ToTable("Roles");
+            builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+            builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+            builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+            builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+            builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
+
+            //----------------------------------------------------------------------
+            // PAYMENT CONFIG
+            //----------------------------------------------------------------------
+            builder.Entity<Payment>(entity =>
             {
-                entity.HasKey(p => p.Id);
+                entity.ToTable("Payments");
+                entity.HasKey(x => x.Id);
 
-                // Remove User configuration since your Payment entity doesn't have User property
-                // Configure owned types if needed for PayerInfo, PayeeInfo, etc.
+                entity.Property(x => x.Amount)
+                      .HasPrecision(18, 2)
+                      .IsRequired();
 
-                // Configure indexes
-                entity.HasIndex(p => p.ExternalTransactionId);
-                entity.HasIndex(p => p.CreatedAt);
-                entity.HasIndex(p => p.Status);
+                entity.Property(x => x.Status)
+                      .HasMaxLength(50);
+
+                entity.Property(x => x.ExternalTransactionId)
+                      .HasMaxLength(128);
+
+                // Foreign key User → Payments
+                entity.HasOne(x => x.User)
+                      .WithMany(u => u.Payments)
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Indexes for performance
+                entity.HasIndex(x => x.ExternalTransactionId);
+                entity.HasIndex(x => x.CreatedAt);
+                entity.HasIndex(x => x.Status);
             });
         }
     }
