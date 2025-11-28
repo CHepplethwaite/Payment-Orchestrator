@@ -32,7 +32,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 // ========= IDENTITY =========
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+// 💡 FIX: Changed ApplicationUser to AppUser to match the DbContext definition.
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireUppercase = true;
@@ -126,12 +127,20 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // NOTE: If you have already run a migration that used 'ApplicationUser' 
+    // instead of 'AppUser' for the SeedData, you might need to drop your database 
+    // or manually fix the data/tables.
     db.Database.Migrate();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await SeedData.InitializeRoles(roleManager);
 
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    // NOTE: This now correctly uses AppUser
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+
+    // 🛑 CS1503 ERROR SOURCE: The SeedData.InitializeSuperAdmin method signature
+    // in SeedData.cs must be updated to accept UserManager<AppUser> instead of 
+    // UserManager<ApplicationUser>. The Program.cs file is correct.
     await SeedData.InitializeSuperAdmin(userManager, roleManager);
 }
 

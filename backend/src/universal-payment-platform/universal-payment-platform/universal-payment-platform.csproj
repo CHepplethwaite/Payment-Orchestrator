@@ -12,6 +12,7 @@
   <ItemGroup>
     <!-- Validation and MediatR -->
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageReference Include="MailKit" Version="4.14.1" />
     <PackageReference Include="MediatR" Version="13.1.0" />
 
     <!-- Authentication & Identity -->
@@ -28,6 +29,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.10" />
+    <PackageReference Include="MimeKit" Version="4.14.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
 
     <!-- Azure & Docker -->

@@ -15,7 +15,8 @@ namespace universal_payment_platform.Infrastructure.Security
             _config = config;
         }
 
-        public string GenerateToken(ApplicationUser user, IList<string> roles)
+        // Change ApplicationUser to AppUser
+        public string GenerateToken(AppUser user, IList<string> roles)
         {
             var jwtKey = _config["Jwt:Key"];
             var issuer = _config["Jwt:Issuer"];
