@@ -51,7 +51,7 @@ namespace universal_payment_platform.Controllers
             var response = await _mediator.Send(request);
 
             // Assuming PaymentStatus is correctly imported from universal_payment_platform.Common
-            if (response.Status == Enums.Failed)
+            if (response.Status == PaymentStatus.Failed)
                 return BadRequest(response);
 
             return Ok(response);

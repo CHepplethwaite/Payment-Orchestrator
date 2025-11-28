@@ -10,7 +10,7 @@ using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Infrastructure.PipelineBehaviors;
 using universal_payment_platform.Infrastructure.Security;
 using universal_payment_platform.Middleware;
-using universal_payment_platform.Repositories.Implementations;
+using universal_payment_platform.Data;
 using universal_payment_platform.Repositories.Interfaces;
 using universal_payment_platform.Services.Adapters.Airtel;
 using universal_payment_platform.Services.Adapters.MTN;
