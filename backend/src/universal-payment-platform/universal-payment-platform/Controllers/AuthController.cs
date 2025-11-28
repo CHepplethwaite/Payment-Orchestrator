@@ -179,5 +179,19 @@ public class AuthController : ControllerBase
         return Ok(new { Message = "If the email exists, a verification link has been sent." });
     }
 
+    #region Request DTOs
+
+    public record RegisterRequest(string Username, string Email, string Password);
+    public record LoginRequest(string Email, string Password);
+    public record ForgotPasswordRequest(string Email);
+    public record ResetPasswordRequest(string Email, string NewPassword);
+    public record ResendVerificationRequest(string Email);
+    public record TwoFactorRequest(string Email);
+    public record TwoFactorEnableRequest(string Email);
+    public record TwoFactorVerifyRequest(string Email, string Token);
+    public record LoginWith2FARequest(string Email, string TwoFactorCode);
+
+    #endregion
+
     // Add similar email sending for 2FA methods...
 }

@@ -3,7 +3,6 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using System.Net.Mail;
 
 namespace universal_payment_platform.Services;
 
@@ -35,7 +34,7 @@ public class EmailService : IEmailService
                 Text = body
             };
 
-            using var smtp = new SmtpClient();
+            using var smtp = new SmtpClient(); // now unambiguous
             await smtp.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, SecureSocketOptions.StartTls);
             await smtp.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password);
             await smtp.SendAsync(email);
