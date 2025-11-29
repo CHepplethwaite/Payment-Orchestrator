@@ -8,30 +8,19 @@ using System.Text.Json;
 
 namespace universal_payment_platform.CQRS.Queries
 {
-    public class GetPaymentQueryHandler : IRequestHandler<GetPaymentQuery, PaymentResponse>
+    public class GetPaymentQueryHandler(
+        IEnumerable<IPaymentAdapter> adapters,
+        IPaymentRepository paymentRepository,
+        ILogger<GetPaymentQueryHandler> logger) : IRequestHandler<GetPaymentQuery, PaymentResponse>
     {
-        private readonly IEnumerable<IPaymentAdapter> _adapters;
-        private readonly IPaymentRepository _paymentRepository;
-        private readonly ILogger<GetPaymentQueryHandler> _logger;
-
-        public GetPaymentQueryHandler(
-            IEnumerable<IPaymentAdapter> adapters,
-            IPaymentRepository paymentRepository,
-            ILogger<GetPaymentQueryHandler> logger)
-        {
-            _adapters = adapters;
-            _paymentRepository = paymentRepository;
-            _logger = logger;
-        }
-
         public async Task<PaymentResponse> Handle(GetPaymentQuery query, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByExternalIdAsync(query.TransactionId);
+            var payment = await paymentRepository.GetByExternalIdAsync(query.TransactionId);
 
             if (payment != null &&
                 (payment.Status == Common.PaymentStatus.Success || payment.Status == Common.PaymentStatus.Failed))
             {
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Returning final status '{Status}' from DB for {TransactionId}",
                     payment.Status, query.TransactionId
                 );
@@ -49,12 +38,12 @@ namespace universal_payment_platform.CQRS.Queries
                 };
             }
 
-            var adapter = _adapters.FirstOrDefault(a =>
+            var adapter = adapters.FirstOrDefault(a =>
                 a.GetAdapterName().Equals(query.Provider, StringComparison.OrdinalIgnoreCase));
 
             if (adapter == null)
             {
-                _logger.LogError("No adapter found for provider {Provider}", query.Provider);
+                logger.LogError("No adapter found for provider {Provider}", query.Provider);
                 return new PaymentResponse
                 {
                     TransactionId = query.TransactionId,
@@ -90,8 +79,8 @@ namespace universal_payment_platform.CQRS.Queries
                     // Set initial provider metadata
                     var initialMetadata = new
                     {
-                        TransactionId = query.TransactionId,
-                        Provider = query.Provider,
+                        query.TransactionId,
+                        query.Provider,
                         ProviderTransactionId = response.ProviderReference ?? string.Empty,
                         Message = response.Message ?? string.Empty,
                         CreatedVia = "StatusQuery",
@@ -99,7 +88,7 @@ namespace universal_payment_platform.CQRS.Queries
                     };
                     payment.ProviderMetadata = JsonSerializer.Serialize(initialMetadata);
 
-                    await _paymentRepository.AddAsync(payment);
+                    await paymentRepository.AddAsync(payment);
                 }
                 else
                 {
@@ -109,8 +98,8 @@ namespace universal_payment_platform.CQRS.Queries
                     // Update provider metadata
                     var updatedMetadata = new
                     {
-                        TransactionId = query.TransactionId,
-                        Provider = query.Provider,
+                        query.TransactionId,
+                        query.Provider,
                         ProviderTransactionId = response.ProviderReference ?? string.Empty,
                         Message = response.Message ?? string.Empty,
                         UpdatedVia = "StatusQuery",
@@ -125,7 +114,7 @@ namespace universal_payment_platform.CQRS.Queries
                         payment.CompletedAt = DateTime.UtcNow;
                     }
 
-                    await _paymentRepository.UpdateAsync(payment);
+                    await paymentRepository.UpdateAsync(payment);
                 }
 
                 return new PaymentResponse
@@ -139,7 +128,7 @@ namespace universal_payment_platform.CQRS.Queries
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking payment status for {TransactionId}", query.TransactionId);
+                logger.LogError(ex, "Error checking payment status for {TransactionId}", query.TransactionId);
 
                 return new PaymentResponse
                 {
@@ -164,7 +153,7 @@ namespace universal_payment_platform.CQRS.Queries
             }
             catch (JsonException ex)
             {
-                _logger.LogWarning(ex, "Failed to deserialize ProviderMetadata JSON");
+                logger.LogWarning(ex, "Failed to deserialize ProviderMetadata JSON");
                 return null;
             }
         }

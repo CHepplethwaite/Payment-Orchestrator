@@ -365,5 +365,15 @@ FodyWeavers.xsd
 # Text files
 *.txt
 
-# Document files
+# Misc files
 *.docx
+
+appsettings.Development.json
+
+appsettings.Local.json
+
+appsettings.Production.json
+
+.env
+
+secrets.json

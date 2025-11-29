@@ -6,29 +6,23 @@ using universal_payment_platform.Data.Entities;
 
 namespace universal_payment_platform.Infrastructure.Security
 {
-    public class JwtTokenProvider
+    public class JwtTokenProvider(IConfiguration config)
     {
-        private readonly IConfiguration _config;
-
-        public JwtTokenProvider(IConfiguration config)
-        {
-            _config = config;
-        }
 
         // Change ApplicationUser to AppUser
         public string GenerateToken(AppUser user, IList<string> roles)
         {
-            var jwtKey = _config["Jwt:Key"];
-            var issuer = _config["Jwt:Issuer"];
-            var audience = _config["Jwt:Audience"];
+            var jwtKey = config["Jwt:Key"];
+            var issuer = config["Jwt:Issuer"];
+            var audience = config["Jwt:Audience"];
 
             if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
                 throw new InvalidOperationException("JWT configuration is missing.");
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? "")
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Email, user.Email ?? "")
             };
 
             // Add role claims

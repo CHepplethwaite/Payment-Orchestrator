@@ -6,15 +6,8 @@ namespace universal_payment_platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProvidersController : ControllerBase
+    public class ProvidersController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public ProvidersController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetSupportedProviders()
         {
@@ -22,7 +15,7 @@ namespace universal_payment_platform.Controllers
             var query = new GetSupportedProvidersQuery();
 
             // Send the query through MediatR
-            var providers = await _mediator.Send(query);
+            var providers = await mediator.Send(query);
 
             return Ok(providers);
         }

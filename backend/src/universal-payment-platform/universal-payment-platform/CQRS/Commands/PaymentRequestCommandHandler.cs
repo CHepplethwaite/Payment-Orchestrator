@@ -79,8 +79,8 @@ namespace universal_payment_platform.CQRS.Commands
             // Add initial provider metadata as JSON
             var providerMetadata = new
             {
-                TransactionId = command.TransactionId,
-                Provider = command.Provider,
+                command.TransactionId,
+                command.Provider,
                 Currency = command.Currency ?? "ZMW",
                 RequestedAt = DateTime.UtcNow
             };
@@ -112,8 +112,8 @@ namespace universal_payment_platform.CQRS.Commands
                 // Update provider metadata with response details
                 var updatedMetadata = new
                 {
-                    TransactionId = command.TransactionId,
-                    Provider = command.Provider,
+                    command.TransactionId,
+                    command.Provider,
                     Currency = command.Currency ?? "ZMW",
                     RequestedAt = payment.CreatedAt,
                     ProviderTransactionId = response.ProviderReference ?? string.Empty,
@@ -162,8 +162,8 @@ namespace universal_payment_platform.CQRS.Commands
                 // Update provider metadata with error
                 var errorMetadata = new
                 {
-                    TransactionId = command.TransactionId,
-                    Provider = command.Provider,
+                    command.TransactionId,
+                    command.Provider,
                     Currency = command.Currency ?? "ZMW",
                     RequestedAt = payment.CreatedAt,
                     Error = ex.Message,

@@ -5,15 +5,11 @@ using universal_payment_platform.Data.Entities;
 
 namespace universal_payment_platform.Data
 {
-    public class ApplicationDbContext
-        : IdentityDbContext<AppUser, IdentityRole, string>
+    public class ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options
+        )
+                : IdentityDbContext<AppUser, IdentityRole, string>(options)
     {
-        public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options
-        ) : base(options)
-        {
-        }
-
         public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

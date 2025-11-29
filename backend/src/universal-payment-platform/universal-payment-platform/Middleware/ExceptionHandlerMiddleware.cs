@@ -5,20 +5,13 @@ using Serilog;
 
 namespace universal_payment_platform.Middleware
 {
-    public class ExceptionHandlerMiddleware
+    public class ExceptionHandlerMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public ExceptionHandlerMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
-                await _next(context); // Call the next middleware
+                await next(context); // Call the next middleware
             }
             catch (Exception ex)
             {
@@ -29,7 +22,7 @@ namespace universal_payment_platform.Middleware
 
                 var response = new
                 {
-                    StatusCode = context.Response.StatusCode,
+                    context.Response.StatusCode,
                     Message = "An unexpected error occurred. Please try again later."
                 };
 

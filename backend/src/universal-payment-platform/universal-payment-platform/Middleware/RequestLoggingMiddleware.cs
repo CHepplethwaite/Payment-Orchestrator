@@ -4,15 +4,8 @@ using Serilog;
 
 namespace universal_payment_platform.Middleware
 {
-    public class RequestLoggingMiddleware
+    public class RequestLoggingMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public RequestLoggingMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task InvokeAsync(HttpContext context)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -21,7 +14,7 @@ namespace universal_payment_platform.Middleware
                 // Log incoming request
                 Log.Information("Handling request {Method} {Path}", context.Request.Method, context.Request.Path);
 
-                await _next(context); // Call next middleware
+                await next(context); // Call next middleware
 
                 stopwatch.Stop();
                 Log.Information("Finished handling request {Method} {Path} in {ElapsedMilliseconds}ms with status {StatusCode}",

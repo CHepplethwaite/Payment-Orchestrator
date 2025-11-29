@@ -17,6 +17,9 @@ using universal_payment_platform.Services.Adapters.MTN;
 using universal_payment_platform.Services.Interfaces;
 using universal_payment_platform.Validators;
 using UniversalPaymentPlatform.Infrastructure.Logging;
+// Add these using statements for email services
+using universal_payment_platform.Infrastructure.Email.Configuration;
+using universal_payment_platform.Infrastructure.Email.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +35,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 // ========= IDENTITY =========
-// 💡 FIX: Changed ApplicationUser to AppUser to match the DbContext definition.
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -40,9 +42,17 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 8;
+
+    // Email confirmation settings
+    options.SignIn.RequireConfirmedEmail = true;
+    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+
+
+// ========= EMAIL SERVICES =========
+builder.Services.AddEmailServices(builder.Configuration);
 
 
 // ========= JWT =========
@@ -71,7 +81,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key),
 
-        ClockSkew = TimeSpan.Zero // 🔥 no 5-minute delay
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -79,7 +89,6 @@ builder.Services.AddSingleton<JwtTokenProvider>();
 
 
 // ========= CORS =========
-// Allow Angular dev + prod
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
@@ -110,6 +119,7 @@ builder.Services.AddMediatR(cfg =>
 
 // ========= REPOSITORIES =========
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+// Add other repositories as needed
 
 
 // ========= ADAPTERS =========
@@ -120,6 +130,11 @@ builder.Services.AddScoped<IPaymentAdapter, AirtelPaymentsAdapter>();
 builder.Services.AddScoped<IPaymentAdapter, MTNPaymentsAdapter>();
 
 
+// ========= HTTP CONTEXT ACCESSOR =========
+// Required for some services to access HTTP context
+builder.Services.AddHttpContextAccessor();
+
+
 var app = builder.Build();
 
 
@@ -127,26 +142,17 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // NOTE: If you have already run a migration that used 'ApplicationUser' 
-    // instead of 'AppUser' for the SeedData, you might need to drop your database 
-    // or manually fix the data/tables.
     db.Database.Migrate();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await SeedData.InitializeRoles(roleManager);
 
-    // NOTE: This now correctly uses AppUser
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-
-    // 🛑 CS1503 ERROR SOURCE: The SeedData.InitializeSuperAdmin method signature
-    // in SeedData.cs must be updated to accept UserManager<AppUser> instead of 
-    // UserManager<ApplicationUser>. The Program.cs file is correct.
     await SeedData.InitializeSuperAdmin(userManager, roleManager);
 }
 
 
 // ========= MIDDLEWARE =========
-// Custom exception before anything
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
@@ -174,7 +180,6 @@ if (!string.IsNullOrEmpty(httpsUrl))
 
 
 // ========= CORS → AUTH → AUTHZ =========
-// HIGHLY IMPORTANT ORDER
 app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();

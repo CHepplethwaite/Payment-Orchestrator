@@ -13,15 +13,8 @@ namespace universal_payment_platform.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class PaymentsController : ControllerBase
+    public class PaymentsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public PaymentsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         private string GetUserId()
         {
             // Fallback: If User ID is truly essential and missing, throw an exception.
@@ -48,7 +41,7 @@ namespace universal_payment_platform.Controllers
 
             // All necessary data (client body + security context) is now in the command.
             // MediatR pipeline (including Fluent Validation) runs here.
-            var response = await _mediator.Send(request);
+            var response = await mediator.Send(request);
 
             // Assuming PaymentStatus is correctly imported from universal_payment_platform.Common
             if (response.Status == PaymentStatus.Failed)
@@ -67,7 +60,7 @@ namespace universal_payment_platform.Controllers
                 return BadRequest("Transaction ID must be specified.");
 
             var query = new GetPaymentQuery(transactionId, provider);
-            var response = await _mediator.Send(query);
+            var response = await mediator.Send(query);
 
             return Ok(response);
         }

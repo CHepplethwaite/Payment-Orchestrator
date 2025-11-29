@@ -1,45 +1,30 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using universal_payment_platform.Data.Entities;
 using universal_payment_platform.Infrastructure.Security;
-using universal_payment_platform.Services;
+using universal_payment_platform.Infrastructure.Email.Services;
+using universal_payment_platform.Infrastructure.Email.Models;
 
 namespace universal_payment_platform.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(
+    UserManager<AppUser> userManager,
+    RoleManager<IdentityRole> roleManager,
+    JwtTokenProvider jwtProvider,
+    IEmailService emailService,
+    IConfiguration configuration,
+    ILogger<AuthController> logger) : ControllerBase
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly JwtTokenProvider _jwtProvider;
-    private readonly IEmailService _emailService;
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(
-        UserManager<AppUser> userManager,
-        RoleManager<IdentityRole> roleManager,
-        JwtTokenProvider jwtProvider,
-        IEmailService emailService,
-        IConfiguration configuration,
-        ILogger<AuthController> logger)
-    {
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _jwtProvider = jwtProvider;
-        _emailService = emailService;
-        _configuration = configuration;
-        _logger = logger;
-    }
+    public JwtTokenProvider JwtProvider { get; } = jwtProvider;
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        if (await _userManager.FindByEmailAsync(request.Email) != null)
+        if (await userManager.FindByEmailAsync(request.Email) != null)
             return BadRequest(new { Message = "Email already exists." });
 
         var user = new AppUser
@@ -49,22 +34,22 @@ public class AuthController : ControllerBase
             EmailConfirmed = false
         };
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+        var result = await userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
-            return BadRequest(new { Errors = result.Errors });
+            return BadRequest(new { result.Errors });
 
         const string publicRole = "EndUser";
-        if (!await _roleManager.RoleExistsAsync(publicRole))
-            await _roleManager.CreateAsync(new IdentityRole(publicRole));
+        if (!await roleManager.RoleExistsAsync(publicRole))
+            await roleManager.CreateAsync(new IdentityRole(publicRole));
 
-        await _userManager.AddToRoleAsync(user, publicRole);
+        await userManager.AddToRoleAsync(user, publicRole);
 
-        var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(emailToken));
         var encodedEmail = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(request.Email));
 
         // Generate verification link
-        var frontendBaseUrl = _configuration["FrontendBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+        var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
         var verificationUrl = $"{frontendBaseUrl}/verify-email?email={encodedEmail}&token={encodedToken}";
 
         // Send verification email
@@ -78,14 +63,19 @@ public class AuthController : ControllerBase
                 <br>
                 <p>Best regards,<br>Universal Payment Platform Team</p>";
 
-            await _emailService.SendEmailAsync(
-                request.Email,
-                "Verify Your Email - Universal Payment Platform",
-                emailBody);
+            var emailMessage = new EmailMessage
+            {
+                To = request.Email,
+                Subject = "Verify Your Email - Universal Payment Platform",
+                Body = emailBody,
+                IsHtml = true
+            };
+
+            await emailService.SendEmailAsync(emailMessage);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send verification email to {Email}", request.Email);
+            logger.LogError(ex, "Failed to send verification email to {Email}", request.Email);
             // Don't return error - still return success but log the issue
         }
 
@@ -96,24 +86,22 @@ public class AuthController : ControllerBase
         });
     }
 
-    // Update other methods similarly...
-
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
             return Ok(new { Message = "If the email exists, a reset link has been sent." });
 
         if (!user.EmailConfirmed)
             return BadRequest(new { Message = "Email not verified. Please verify your email first." });
 
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
         var encodedEmail = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(request.Email));
 
         // Generate reset link
-        var frontendBaseUrl = _configuration["FrontendBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+        var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
         var resetUrl = $"{frontendBaseUrl}/reset-password?email={encodedEmail}&token={encodedToken}";
 
         try
@@ -126,14 +114,19 @@ public class AuthController : ControllerBase
                 <br>
                 <p>Best regards,<br>Universal Payment Platform Team</p>";
 
-            await _emailService.SendEmailAsync(
-                request.Email,
-                "Password Reset Request - Universal Payment Platform",
-                emailBody);
+            var emailMessage = new EmailMessage
+            {
+                To = request.Email,
+                Subject = "Password Reset Request - Universal Payment Platform",
+                Body = emailBody,
+                IsHtml = true
+            };
+
+            await emailService.SendEmailAsync(emailMessage);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send password reset email to {Email}", request.Email);
+            logger.LogError(ex, "Failed to send password reset email to {Email}", request.Email);
         }
 
         return Ok(new { Message = "If the email exists, a password reset link has been sent." });
@@ -142,18 +135,18 @@ public class AuthController : ControllerBase
     [HttpPost("resend-verification")]
     public async Task<IActionResult> ResendVerification([FromBody] ResendVerificationRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
             return Ok(new { Message = "If the email exists, a verification link has been sent." });
 
         if (user.EmailConfirmed)
             return BadRequest(new { Message = "Email is already verified." });
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
         var encodedEmail = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(request.Email));
 
-        var frontendBaseUrl = _configuration["FrontendBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+        var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
         var verificationUrl = $"{frontendBaseUrl}/verify-email?email={encodedEmail}&token={encodedToken}";
 
         try
@@ -166,14 +159,19 @@ public class AuthController : ControllerBase
                 <br>
                 <p>Best regards,<br>Universal Payment Platform Team</p>";
 
-            await _emailService.SendEmailAsync(
-                request.Email,
-                "Verify Your Email - Universal Payment Platform",
-                emailBody);
+            var emailMessage = new EmailMessage
+            {
+                To = request.Email,
+                Subject = "Verify Your Email - Universal Payment Platform",
+                Body = emailBody,
+                IsHtml = true
+            };
+
+            await emailService.SendEmailAsync(emailMessage);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send verification email to {Email}", request.Email);
+            logger.LogError(ex, "Failed to send verification email to {Email}", request.Email);
         }
 
         return Ok(new { Message = "If the email exists, a verification link has been sent." });
@@ -193,5 +191,5 @@ public class AuthController : ControllerBase
 
     #endregion
 
-    // Add similar email sending for 2FA methods...
+    // Add other authentication methods as needed...
 }
