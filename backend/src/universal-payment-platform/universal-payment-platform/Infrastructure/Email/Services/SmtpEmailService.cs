@@ -6,17 +6,27 @@ using universal_payment_platform.Infrastructure.Email.Models;
 
 namespace universal_payment_platform.Infrastructure.Email.Services
 {
-    public class SmtpEmailService(
-        IOptions<EmailSettings> emailSettings,
-        IEmailTemplateRenderer templateRenderer,
-        ILogger<SmtpEmailService> logger) : IEmailService
+    public class SmtpEmailService : IEmailService
     {
-        private readonly EmailSettings _emailSettings = emailSettings.Value;
-        private readonly IEmailTemplateRenderer _templateRenderer = templateRenderer;
-        private readonly ILogger<SmtpEmailService> _logger = logger;
+        private readonly EmailSettings _emailSettings;
+        private readonly IEmailTemplateRenderer _templateRenderer;
+        private readonly ILogger<SmtpEmailService> _logger;
+
+        public SmtpEmailService(
+            IOptions<EmailSettings> emailSettings,
+            IEmailTemplateRenderer templateRenderer,
+            ILogger<SmtpEmailService> logger)
+        {
+            _emailSettings = emailSettings.Value;
+            _templateRenderer = templateRenderer;
+            _logger = logger;
+        }
 
         public async Task SendEmailAsync(EmailMessage emailMessage)
         {
+            if (string.IsNullOrWhiteSpace(emailMessage.To))
+                throw new ArgumentException("Recipient email cannot be empty", nameof(emailMessage.To));
+
             try
             {
                 using var client = CreateSmtpClient();
@@ -35,6 +45,9 @@ namespace universal_payment_platform.Infrastructure.Email.Services
 
         public async Task SendTemplatedEmailAsync<T>(string to, string subject, string templateName, T model) where T : class
         {
+            if (string.IsNullOrWhiteSpace(to))
+                throw new ArgumentException("Recipient email cannot be empty", nameof(to));
+
             var body = await _templateRenderer.RenderTemplateAsync(templateName, model);
 
             var emailMessage = new EmailMessage
@@ -43,7 +56,7 @@ namespace universal_payment_platform.Infrastructure.Email.Services
                 Subject = subject,
                 Body = body,
                 IsHtml = true,
-                From = _emailSettings.FromAddress
+                From = _emailSettings.SenderEmail,  // <- Use SenderEmail from config
             };
 
             await SendEmailAsync(emailMessage);
@@ -64,7 +77,7 @@ namespace universal_payment_platform.Infrastructure.Email.Services
         {
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(_emailSettings.FromAddress, _emailSettings.FromName),
+                From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                 Subject = emailMessage.Subject,
                 Body = emailMessage.Body,
                 IsBodyHtml = emailMessage.IsHtml
