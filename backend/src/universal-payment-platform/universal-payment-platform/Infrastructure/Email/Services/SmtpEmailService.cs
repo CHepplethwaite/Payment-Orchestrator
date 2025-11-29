@@ -1,31 +1,30 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
-using universal_payment_platform.Infrastructure.Email.Configuration;
 using universal_payment_platform.Infrastructure.Email.Models;
+using universal_payment_platform.Infrastructure.Email.Configuration;
 
 namespace universal_payment_platform.Infrastructure.Email.Services
 {
-    public class SmtpEmailService : IEmailService
+    public class SmtpEmailService(
+        IOptions<EmailSettings> emailSettings,
+        IEmailTemplateRenderer templateRenderer,
+        ILogger<SmtpEmailService> logger) : IEmailService
     {
-        private readonly EmailSettings _emailSettings;
-        private readonly IEmailTemplateRenderer _templateRenderer;
-        private readonly ILogger<SmtpEmailService> _logger;
-
-        public SmtpEmailService(
-            IOptions<EmailSettings> emailSettings,
-            IEmailTemplateRenderer templateRenderer,
-            ILogger<SmtpEmailService> logger)
-        {
-            _emailSettings = emailSettings.Value;
-            _templateRenderer = templateRenderer;
-            _logger = logger;
-        }
+        private readonly EmailSettings _emailSettings = emailSettings.Value;
+        private readonly IEmailTemplateRenderer _templateRenderer = templateRenderer;
+        private readonly ILogger<SmtpEmailService> _logger = logger;
 
         public async Task SendEmailAsync(EmailMessage emailMessage)
         {
+            ArgumentException.ThrowIfNullOrEmpty(emailMessage.To, nameof(emailMessage.To));
+
             if (string.IsNullOrWhiteSpace(emailMessage.To))
-                throw new ArgumentException("Recipient email cannot be empty", nameof(emailMessage.To));
+            {
+                // Use ArgumentException instead of ArgumentNullException since the parameter is valid,
+                // but the property value is invalid
+                throw new ArgumentException("Recipient email cannot be empty.", nameof(emailMessage));
+            }
 
             try
             {
@@ -46,7 +45,7 @@ namespace universal_payment_platform.Infrastructure.Email.Services
         public async Task SendTemplatedEmailAsync<T>(string to, string subject, string templateName, T model) where T : class
         {
             if (string.IsNullOrWhiteSpace(to))
-                throw new ArgumentException("Recipient email cannot be empty", nameof(to));
+                throw new ArgumentException("Recipient email cannot be empty.", nameof(to));
 
             var body = await _templateRenderer.RenderTemplateAsync(templateName, model);
 
@@ -85,10 +84,13 @@ namespace universal_payment_platform.Infrastructure.Email.Services
 
             mailMessage.To.Add(emailMessage.To);
 
-            foreach (var attachment in emailMessage.Attachments)
+            if (emailMessage.Attachments != null)
             {
-                var stream = new MemoryStream(attachment.Content);
-                mailMessage.Attachments.Add(new Attachment(stream, attachment.FileName, attachment.ContentType));
+                foreach (var attachment in emailMessage.Attachments)
+                {
+                    var stream = new MemoryStream(attachment.Content);
+                    mailMessage.Attachments.Add(new Attachment(stream, attachment.FileName, attachment.ContentType));
+                }
             }
 
             return mailMessage;
