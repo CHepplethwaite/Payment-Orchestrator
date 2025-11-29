@@ -372,6 +372,8 @@ appsettings.Development.json
 
 appsettings.Local.json
 
+appsettings.json
+
 appsettings.Production.json
 
 .env
